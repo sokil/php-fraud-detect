@@ -7,5 +7,10 @@
             "email": "dmytro.sokil@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Sokil\\FloodDetector": "src/"
+        }
+    }
 }
