@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\FloodDetector;
+namespace Sokil\FraudDetector;
 
 class Detector
 {
