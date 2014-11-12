@@ -1,0 +1,11 @@
+{
+    "name": "sokil/php-flood-detect",
+    "description": "Detecting requrest flood",
+    "authors": [
+        {
+            "name": "Dmytro Sokil",
+            "email": "dmytro.sokil@gmail.com"
+        }
+    ],
+    "require": {}
+}
