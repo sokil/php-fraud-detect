@@ -27,6 +27,15 @@ class Detector
             }
         }
         
+        // is ban required
+        foreach($this->banConditions as $condition) {
+            $state = $condition->passed()
+                ? self::STATE_PASSED
+                : self::STATE_FAILED;
+            
+            $this->setState($state);
+        }
+        
         $this->callDelayedHandlers();
     }
     
