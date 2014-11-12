@@ -1,5 +1,5 @@
 {
-    "name": "sokil/php-flood-detect",
+    "name": "sokil/php-fraud-detect",
     "description": "Detecting requrest flood",
     "authors": [
         {
@@ -10,7 +10,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "Sokil\\FloodDetector": "src/"
+            "Sokil\\FraudDetector": "src/"
         }
     }
 }
