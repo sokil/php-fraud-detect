@@ -5,19 +5,33 @@ namespace Sokil\FraudDetector;
 class Detector
 {
     const STATE_UNCHECKED   = 'unckecked';
+    const STATE_SKIPPED     = 'skipped';
     const STATE_PASSED      = 'checkPassed';
     const STATE_FAILED      = 'checkFailed';
     
     private $state;
     
-    private $handlers = array(
-        'checkPassed' => array(),
-        'checkFailed' => array(),
-    );
+    private $handlers = array();
+    
+    private $checkConditions = array();
+    
+    private $banConditions = array();
     
     public function check()
     {        
         $this->callDelayedHandlers();
+    }
+    
+    public function addCheckCondition(AbstractCheckCondition $condition)
+    {
+        $this->checkConditions[] = $condition;
+        return $this;
+    }
+    
+    public function addBanCondition(AbstractBanCondition $condition)
+    {
+        $this->banConditions[] = $condition;
+        return $this;
     }
     
     public function onCheckPassed($callable)
@@ -30,6 +44,13 @@ class Detector
     public function onCheckFailed($callable)
     {
         $this->on(self::STATE_FAILED, $callable);
+        
+        return $this;
+    }
+    
+    public function onCheckSkipped($callable)
+    {
+        $this->on(self::STATE_SKIPPED, $callable);
         
         return $this;
     }
@@ -47,6 +68,11 @@ class Detector
     public function isFailed()
     {
         return $this->hasState(self::STATE_FAILED);
+    }
+    
+    public function isSkipped()
+    {
+        return $this->hasState(self::STATE_SKIPPED);
     }
     
     private function on($stateName, $callable)
@@ -74,6 +100,10 @@ class Detector
     
     private function callDelayedHandlers()
     {
+        if(empty($this->handlers[$this->state])) {
+            return $this;
+        }
+        
         foreach($this->handlers[$this->state] as $callable) {
             $this->callHandler($callable);
         }
