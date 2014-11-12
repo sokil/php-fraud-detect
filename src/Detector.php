@@ -4,53 +4,85 @@ namespace Sokil\FraudDetector;
 
 class Detector
 {
-    private $passed;
+    const STATE_UNCHECKED   = 'unckecked';
+    const STATE_PASSED      = 'checkPassed';
+    const STATE_FAILED      = 'checkFailed';
+    
+    private $state;
     
     private $handlers = array(
         'checkPassed' => array(),
         'checkFailed' => array(),
     );
     
+    public function check()
+    {        
+        $this->callDelayedHandlers();
+    }
+    
     public function onCheckPassed($callable)
     {
-        return $this->addHandler('checkPassed', $callable);
+        $this->on(self::STATE_PASSED, $callable);
+        
+        return $this;
     }
     
     public function onCheckFailed($callable)
     {
-        return $this->addHandler('checkFailed', $callable);
+        $this->on(self::STATE_FAILED, $callable);
+        
+        return $this;
     }
     
-    private function addHandler($name, $callable)
+    public function isUnchecked()
+    {
+        return $this->hasState(self::STATE_UNCHECKED);
+    }
+    
+    public function isPassed()
+    {
+        return $this->hasState(self::STATE_PASSED);
+    }
+    
+    public function isFailed()
+    {
+        return $this->hasState(self::STATE_FAILED);
+    }
+    
+    private function on($stateName, $callable)
+    {
+        if($this->hasState(self::STATE_UNCHECKED)) {
+            $this->delayHandler(self::STATE_FAILED, $callable);
+        } elseif($this->hasState($stateName)) {
+            $this->callHandler($callable);
+        }
+        
+        return $this;
+    }
+    
+    private function callHandler($callable)
+    {
+        call_user_func($callable);
+        return $this;
+    }
+    
+    private function delayHandler($name, $callable)
     {
         $this->handlers[$name][] = $callable;
         return $this;
     }
     
-    private function callHandlers($name)
+    private function callDelayedHandlers()
     {
-        foreach($this->handlers[$name] as $callable) {
-            call_user_func($callable);
+        foreach($this->handlers[$this->state] as $callable) {
+            $this->callHandler($callable);
         }
         
         return $this;
     }
     
-    public function check()
+    private function hasState($name)
     {
-        // Check already done. Just call handlers
-        if(null !== $this->passed) {
-            if($this->passed) {
-                // call passed handlers
-                $this->callHandlers('checkPassed');
-            } else {
-                // call failed handlers
-                $this->callHandlers('checkFailed');
-            }
-        }
-        
-        // check
-        
-        // trigger handlers
+        return $this->state === $name;
     }
 }
