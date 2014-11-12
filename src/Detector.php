@@ -18,7 +18,15 @@ class Detector
     private $banConditions = array();
     
     public function check()
-    {        
+    {
+        // is check required
+        foreach($this->checkConditions as $condition) {
+            if(!$condition->passed()) {
+                $this->setState(self::STATE_SKIPPED);
+                return;
+            }
+        }
+        
         $this->callDelayedHandlers();
     }
     
@@ -111,8 +119,14 @@ class Detector
         return $this;
     }
     
-    private function hasState($name)
+    private function hasState($state)
     {
-        return $this->state === $name;
+        return $this->state === $state;
+    }
+    
+    private function setState($state)
+    {
+        $this->state = $state;
+        return $this;
     }
 }
