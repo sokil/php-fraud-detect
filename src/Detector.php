@@ -17,6 +17,13 @@ class Detector
     
     private $banConditions = array();
     
+    public function __construct(array $config = null)
+    {
+        if($config) {
+            $this->configure($config);
+        }
+    }
+    
     public function check()
     {
         // is check required
@@ -90,6 +97,25 @@ class Detector
     public function isSkipped()
     {
         return $this->hasState(self::STATE_SKIPPED);
+    }
+    
+    private function configure(array $config)
+    {
+        // check condifion
+        if(!empty($config['condition']['check']) && is_array($config['condition']['check'])) {
+            foreach($config['condition']['check'] as $conditionDefinition) {
+                $conditionClassName = $conditionDefinition[0];
+                $this->addCheckCondition(new $conditionClassName($conditionDefinition));
+            }
+        }
+        
+        // ban condifion
+        if(!empty($config['condition']['ban']) && is_array($config['condition']['ban'])) {
+            foreach($config['condition']['check'] as $conditionDefinition) {
+                $conditionClassName = $conditionDefinition[0];
+                $this->addBanCondition(new $conditionClassName($conditionDefinition));
+            }
+        }
     }
     
     private function on($stateName, $callable)
