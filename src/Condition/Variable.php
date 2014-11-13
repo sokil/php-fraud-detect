@@ -1,8 +1,8 @@
 <?php
 
-namespace Sokil\FraudDetector\CheckCondition;
+namespace Sokil\FraudDetector\Condition;
 
-class Variable extends \Sokil\FraudDetector\AbstractCheckCondition
+class Variable extends \Sokil\FraudDetector\AbstractCondition
 {
     const CONDITION_EXISTS      = 'exists';
     const CONDITION_EQUALS      = '==';

@@ -15,7 +15,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $GLOBALS['globalVariable'] = 42;
         
         $detector
-            ->addCheckCondition('variable', function($condition) {
+            ->addCondition('variable', function($condition) {
                 $condition
                     ->setName('globalVariable')
                     ->greater(40)
@@ -26,9 +26,6 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
             })
             ->onCheckFailed(function() use($that) {
                 $that->fail('Check must pass, but fail');
-            })
-            ->onCheckSkipped(function() use($that) {
-                $that->fail('Check must pass, but skip');
             })
             ->check();
             
