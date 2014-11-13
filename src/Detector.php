@@ -56,16 +56,12 @@ class Detector
     }
     
     public function addCondition($name, $callable = null)
-    {
-        if(!is_callable($callable)) {
-            throw new \Exception('Wrong callable');
-        }
-        
+    {        
         // create condition
         $condition = $this->createCondition($name);
         
         // configure condition
-        if($callable) {
+        if($callable && is_callable($callable)) {
             call_user_func($callable, $condition);
         }
         
