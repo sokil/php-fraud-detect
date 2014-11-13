@@ -31,7 +31,7 @@ class Variable extends \Sokil\FraudDetector\AbstractCondition
         return array_key_exists($this->name, $GLOBALS);
     }
     
-    public function passed() 
+    public function isPassed() 
     {        
         foreach($this->conditionList as $condition => $conditionValue) {
             switch($condition) {

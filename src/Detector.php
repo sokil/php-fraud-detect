@@ -18,13 +18,6 @@ class Detector
     
     private $conditions = array();
     
-    public function __construct(array $config = null)
-    {
-        if($config) {
-            $this->configure($config);
-        }
-    }
-    
     /**
      * Factory method to create new check condition
      * 
@@ -52,7 +45,7 @@ class Detector
     public function check()
     {          
         foreach($this->conditions as $condition) {
-            $state = $condition->passed()
+            $state = $condition->isPassed()
                 ? self::STATE_PASSED
                 : self::STATE_FAILED;
 
@@ -107,15 +100,6 @@ class Detector
     public function isFailed()
     {
         return $this->hasState(self::STATE_FAILED);
-    }
-    
-    private function configure(array $config)
-    {
-        if(!empty($config['condition']) && is_array($config['condition'])) {
-            foreach($config['condition'] as $conditionDefinition) {
-
-            }
-        }
     }
     
     private function on($stateName, $callable)

@@ -4,5 +4,5 @@ namespace Sokil\FraudDetector;
 
 abstract class AbstractCondition
 {
-    abstract public function passed();
+    abstract public function isPassed();
 }
