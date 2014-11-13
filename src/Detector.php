@@ -55,7 +55,7 @@ class Detector
         $this->callDelayedHandlers();
     }
     
-    public function addCondition($name, $callable)
+    public function addCondition($name, $callable = null)
     {
         if(!is_callable($callable)) {
             throw new \Exception('Wrong callable');
@@ -65,7 +65,9 @@ class Detector
         $condition = $this->createCondition($name);
         
         // configure condition
-        call_user_func($callable, $condition);
+        if($callable) {
+            call_user_func($callable, $condition);
+        }
         
         // add to list
         $this->conditions[] = $condition;
