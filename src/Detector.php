@@ -29,7 +29,7 @@ class Detector
      * Factory method to create new check condition
      * 
      * @param string $name name of check condition
-     * @return \Sokil\FraudDetector\fullyQualifiedClassName
+     * @return \Sokil\FraudDetector\AbstractCondition
      * @throws \Exception
      */
     private function createCondition($name)
