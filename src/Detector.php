@@ -12,12 +12,103 @@ class Detector
         '\Sokil\FraudDetector\Condition',
     );
     
+    private $collectorNamespaces = array(
+        '\Sokil\FraudDetector\Collector',
+    );
+    
     private $state = self::STATE_UNCHECKED;
     
     private $handlers = array();
     
     private $conditions = array();
     
+    private $collector;
+    
+    /**
+     *
+     * @var mixed key to identify unique user
+     */
+    private $key;
+    
+    public function __construct()
+    {
+        // default key is ip of user
+        $this->key = $_SERVER['REMOTE_ADDR'];
+        
+        // define collectiong of successfully passed requests 
+        // to gather stat for ban list
+        $that = $this;
+        $this->onCheckPassed(function() use($that) {
+            $this->collect($that->key);
+        });
+    }
+    
+    /**
+     * Key that uniquely identify user
+     * @param type $key
+     * @return \Sokil\FraudDetector\Detector
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+        return $this;
+    }
+    
+    public function setCollector($type, $storage)
+    {
+        $this->collector = $this
+            ->createCollector($type)
+            ->setStorage($storage);
+    }
+    
+    /**
+     * Factory method to create new collector
+     * 
+     * @param string $type Type of storage
+     * @return \Sokil\FraudDetector\AbstractCollector
+     * @throws \Exception
+     */
+    private function createCollector($type)
+    {
+        $className = ucfirst($type);
+        
+        foreach($this->collectorNamespaces as $namespace) {
+            $fullyQualifiedClassName = $namespace . '\\' . $className;
+            if(class_exists($fullyQualifiedClassName)) {
+                return new $fullyQualifiedClassName();
+            }
+        }
+        
+        throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
+    }
+    
+    private function collect($key)
+    {
+        if(!$this->collector) {
+            throw new \Exception('Collector not configured');
+        }
+        
+        $this->collector->collect($key);
+        
+        return $this;
+    }
+    
+    /**
+     * Check if request is not fraud
+     */
+    public function check()
+    {
+        foreach($this->conditions as $condition) {
+            $state = $condition->isPassed()
+                ? self::STATE_PASSED
+                : self::STATE_FAILED;
+
+            $this->setState($state);
+        }
+        
+        $this->callDelayedHandlers();
+    }
+     
     /**
      * Factory method to create new check condition
      * 
@@ -37,22 +128,6 @@ class Detector
         }
         
         throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
-    }
-    
-    /**
-     * Check if request is not fraud
-     */
-    public function check()
-    {          
-        foreach($this->conditions as $condition) {
-            $state = $condition->isPassed()
-                ? self::STATE_PASSED
-                : self::STATE_FAILED;
-
-            $this->setState($state);
-        }
-        
-        $this->callDelayedHandlers();
     }
     
     public function addCondition($name, $callable = null)
