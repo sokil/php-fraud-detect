@@ -6,7 +6,9 @@ abstract class AbstractCollector
 {
     private $storage;
     
-    private $allowedRequestRate = 1;
+    private $requestNum = 1;
+    
+    private $timeIntervalLengthInSeconds = 1;
     
     public function setStorage($storage)
     {
@@ -21,21 +23,22 @@ abstract class AbstractCollector
     
     public function setRate($requestNum, $timeIntervalLengthInSeconds)
     {
-        $this->allowedRequestRate = $requestNum / $timeIntervalLengthInSeconds;
+        $this->requestNum = $requestNum;
+        $this->timeIntervalLengthInSeconds = $timeIntervalLengthInSeconds;
         return $this;
     }
     
-    protected function getRate()
+    protected function getRequestNum()
     {
-        return $this->allowedRequestRate;
+        return $this->requestNum;
     }
     
-    public function collect($key)
+    protected function getTimeIntervalLengthInSeconds()
     {
-        $this->store($key, time());
+        return $this->timeIntervalLengthInSeconds;
     }
     
-    abstract protected function store($key, $time);
+    abstract public function collect($key);
     
-    abstract public function isLimitExceed($key);
+    abstract protected function banKey($key);
 }

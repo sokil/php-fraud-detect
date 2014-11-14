@@ -15,6 +15,8 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $GLOBALS['globalVariable'] = 42;
         
         $detector
+            ->setKey('someKey')
+            ->setCollector('fake')
             ->addCondition('variable', function($condition) {
                 $condition
                     ->setName('globalVariable')
@@ -43,7 +45,9 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $_SERVER['HTTP_X_FORWARDED_FOR'] = '10.0.0.1';
         
         $detector
-            ->addCondition('proxy')
+            ->setKey('someKey')
+            ->setCollector('fake')
+            ->addCondition('noProxy')
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
             })

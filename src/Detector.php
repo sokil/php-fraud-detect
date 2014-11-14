@@ -33,7 +33,7 @@ class Detector
     public function __construct()
     {
         // default key is ip of user
-        $this->key = $_SERVER['REMOTE_ADDR'];
+        $this->key = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
         
         // define collectiong of successfully passed requests 
         // to gather stat for ban list
@@ -54,11 +54,15 @@ class Detector
         return $this;
     }
     
-    public function setCollector($type, $storage)
+    public function setCollector($type, $callable = null)
     {
-        $this->collector = $this
-            ->createCollector($type)
-            ->setStorage($storage);
+        $this->collector = $this->createCollector($type);
+        
+        if($callable) {
+            call_user_func($this->collector);
+        }
+        
+        return $this;
     }
     
     /**
@@ -70,7 +74,7 @@ class Detector
      */
     private function createCollector($type)
     {
-        $className = ucfirst($type);
+        $className = ucfirst($type) . 'Collector';
         
         foreach($this->collectorNamespaces as $namespace) {
             $fullyQualifiedClassName = $namespace . '\\' . $className;
