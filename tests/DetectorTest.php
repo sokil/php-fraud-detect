@@ -17,6 +17,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
             ->setKey('someKey')
             ->setRequestRate(5, 1)
             ->setCollector('fake')
+            ->setBlackListStorage('fake')
             ->addCondition('variable', function($condition) {
                 $condition
                     ->setName('globalVariable')

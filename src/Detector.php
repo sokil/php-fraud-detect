@@ -110,6 +110,11 @@ class Detector
         throw new \Exception('Collector ' . $this->collectorType . ' not found');
     }
     
+    public function setBlackListStorage($name)
+    {
+        
+    }
+    
     /**
      * Check if request is not fraud
      */
