@@ -4,49 +4,63 @@ namespace Sokil\FraudDetector\Collector;
 
 class FakeCollector extends \Sokil\FraudDetector\AbstractCollector
 {
-    private $storage = array();
+    protected $storage = array();
     
-    private function resetKeyCounter($key)
+    private $key;
+    
+    private $requestNum;
+    
+    private $timeInterval;
+    
+    public function __construct($key, $requestNum, $timeInterval)
     {
-        $this->storage[$key] = array('time' => time(), 'counter' => 1);
+        $this->key = $key;
+        
+        $this->requestNum = $requestNum;
+        
+        $this->timeInterval = $timeInterval;
+    }
+    
+    private function keyExists()
+    {
+        return isset($this->storage[$this->key]);
+    }
+    
+    private function initKey()
+    {
+        $this->storage[$this->key] = array('time' => time(), 'requestNum' => 1);
         return $this;
     }
     
-    private function incrementKeyCounter($key)
+    private function incrementKeyRequestNum()
     {
-        $this->storage[$key]['counter']++;
+        $this->storage[$this->key]['requestNum']++;
         return $this;
     }
     
-    private function isInTimeSlot($key)
+    private function isInTimeSlot()
     {
-        return $this->storage[$key]['time'] < time() - $this->getTimeIntervalLengthInSeconds();
+        return $this->storage[$this->key]['time'] + $this->timeInterval < time();
     }
     
-    private function isRequestNumExceed($key)
-    {
-        return $this->storage[$key]['counter'] > $this->getRequestNum();
+    private function isRequestLimitExceed()
+    {        
+        return $this->storage[$this->key]['requestNum'] < $this->requestNum;
     }
     
-    public function collect($key)
+    public function collect()
     {
-        if(empty($this->storage[$key])) {
-            $this->resetKeyCounter($key);
-        } else {
-            if($this->isInTimeSlot($key)) {
-                if($this->isRequestNumExceed($key)) {
-                    $this->banKey($key);
-                } else {
-                    $this->incrementKeyCounter($key);
-                }
-            } else {
-                $this->resetKeyCounter($key);
-            }
+        if(!$this->keyExists() || !$this->isInTimeSlot()) {
+            $this->initKey();
+            return;
         }
-    }
-    
-    protected function banKey($key)
-    {
+        
+        if($this->isRequestLimitExceed()) {
+            throw new RequestLimitExceedException;
+        }
+        
+        $this->incrementKeyRequestNum();
+        return;
         
     }
 }

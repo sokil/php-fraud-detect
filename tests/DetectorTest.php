@@ -16,6 +16,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector
             ->setKey('someKey')
+            ->setRequestRate(10, 30)
             ->setCollector('fake')
             ->addCondition('variable', function($condition) {
                 $condition

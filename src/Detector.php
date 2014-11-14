@@ -22,6 +22,10 @@ class Detector
     
     private $conditions = array();
     
+    private $collectorType;
+    
+    private $collectorConfiguratorCallable;
+    
     private $collector;
     
     /**
@@ -30,17 +34,14 @@ class Detector
      */
     private $key;
     
+    private $requestNumber = 1;
+    
+    private $timeInterval = 1;
+    
     public function __construct()
     {
         // default key is ip of user
         $this->key = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
-        
-        // define collectiong of successfully passed requests 
-        // to gather stat for ban list
-        $that = $this;
-        $this->onCheckPassed(function() use($that) {
-            $this->collect($that->key);
-        });
     }
     
     /**
@@ -54,13 +55,22 @@ class Detector
         return $this;
     }
     
+    public function setRequestRate($requestNumber, $timeInterval)
+    {
+        $this->requestNumber = $requestNumber;
+        $this->timeInterval = $timeInterval;
+        return $this;
+    }
+    
     public function setCollector($type, $callable = null)
     {
-        $this->collector = $this->createCollector($type);
+        $this->collectorType = $type;
         
-        if($callable) {
-            call_user_func($this->collector);
+        if($callable && is_callable($callable)) {
+            $this->collectorConfiguratorCallable = $callable;
         }
+        
+        $this->collector = null;
         
         return $this;
     }
@@ -72,29 +82,29 @@ class Detector
      * @return \Sokil\FraudDetector\AbstractCollector
      * @throws \Exception
      */
-    private function createCollector($type)
+    private function getCollector()
     {
-        $className = ucfirst($type) . 'Collector';
+        if($this->collector) {
+            return $this->collector;
+        }
+        
+        $className = ucfirst($this->collectorType) . 'Collector';
         
         foreach($this->collectorNamespaces as $namespace) {
             $fullyQualifiedClassName = $namespace . '\\' . $className;
             if(class_exists($fullyQualifiedClassName)) {
-                return new $fullyQualifiedClassName();
+                $this->collector = new $fullyQualifiedClassName($this->key, $this->requestNumber, $this->timeInterval);
+                
+                // configure
+                if($this->collectorConfiguratorCallable) {
+                    call_user_func($this->collectorConfiguratorCallable, $this->collector);
+                }
+                
+                return $this->collector;
             }
         }
         
-        throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
-    }
-    
-    private function collect($key)
-    {
-        if(!$this->collector) {
-            throw new \Exception('Collector not configured');
-        }
-        
-        $this->collector->collect($key);
-        
-        return $this;
+        throw new \Exception('Collector ' . $this->collectorType . ' not found');
     }
     
     /**
@@ -102,6 +112,7 @@ class Detector
      */
     public function check()
     {
+        // check all conditions
         foreach($this->conditions as $condition) {
             $state = $condition->isPassed()
                 ? self::STATE_PASSED
@@ -110,6 +121,13 @@ class Detector
             $this->setState($state);
         }
         
+        // collect stat
+        if($this->isPassed()) {
+            if(!$this->getCollector()->collect()) {
+                // ban key
+            }
+        }
+
         $this->callDelayedHandlers();
     }
      
@@ -179,6 +197,17 @@ class Detector
         return $this->hasState(self::STATE_FAILED);
     }
     
+    private function hasState($state)
+    {
+        return $this->state === $state;
+    }
+    
+    private function setState($state)
+    {
+        $this->state = $state;
+        return $this;
+    }
+    
     private function on($stateName, $callable)
     {
         if($this->hasState(self::STATE_UNCHECKED)) {
@@ -212,17 +241,6 @@ class Detector
             $this->callHandler($callable);
         }
         
-        return $this;
-    }
-    
-    private function hasState($state)
-    {
-        return $this->state === $state;
-    }
-    
-    private function setState($state)
-    {
-        $this->state = $state;
         return $this;
     }
 }
