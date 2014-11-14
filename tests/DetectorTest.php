@@ -7,16 +7,15 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
     public function testCheck_Variable()
     {
         $detector = new Detector();
-        $that = $this;
         
         $status = new \stdClass();
-        $status->ok = false;
+        $status->ok = null;
         
         $GLOBALS['globalVariable'] = 42;
         
         $detector
             ->setKey('someKey')
-            ->setRequestRate(10, 30)
+            ->setRequestRate(5, 1)
             ->setCollector('fake')
             ->addCondition('variable', function($condition) {
                 $condition
@@ -27,12 +26,17 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
             })
-            ->onCheckFailed(function() use($that) {
-                $that->fail('Check must pass, but fail');
-            })
-            ->check();
+            ->onCheckFailed(function() use($status) {
+                $status->ok = false;
+            });
             
-        $this->assertTrue($status->ok);
+        for($i = 0; $i < 5; $i++) {
+            $detector->check();
+            $this->assertTrue($status->ok);
+        }
+        
+        $detector->check();
+        $this->assertFalse($status->ok);    
     }
     
     public function testCheck_Proxy()

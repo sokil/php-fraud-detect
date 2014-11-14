@@ -91,17 +91,20 @@ class Detector
         $className = ucfirst($this->collectorType) . 'Collector';
         
         foreach($this->collectorNamespaces as $namespace) {
+            
             $fullyQualifiedClassName = $namespace . '\\' . $className;
-            if(class_exists($fullyQualifiedClassName)) {
-                $this->collector = new $fullyQualifiedClassName($this->key, $this->requestNumber, $this->timeInterval);
-                
-                // configure
-                if($this->collectorConfiguratorCallable) {
-                    call_user_func($this->collectorConfiguratorCallable, $this->collector);
-                }
-                
-                return $this->collector;
+            if(!class_exists($fullyQualifiedClassName)) {
+                continue;
             }
+            
+            $this->collector = new $fullyQualifiedClassName($this->key, $this->requestNumber, $this->timeInterval);
+
+            // configure
+            if($this->collectorConfiguratorCallable) {
+                call_user_func($this->collectorConfiguratorCallable, $this->collector);
+            }
+
+            return $this->collector;
         }
         
         throw new \Exception('Collector ' . $this->collectorType . ' not found');
@@ -125,6 +128,7 @@ class Detector
         if($this->isPassed()) {
             if(!$this->getCollector()->collect()) {
                 // ban key
+                $this->setState(self::STATE_FAILED);
             }
         }
 
