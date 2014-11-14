@@ -16,7 +16,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $detector
             ->setKey('someKey')
             ->setRequestRate(5, 1)
-            ->setCollector('fake')
+            ->setCollectorStorage('fake')
             ->setBlackListStorage('fake')
             ->addCondition('variable', function($condition) {
                 $condition
@@ -52,7 +52,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector
             ->setKey('someKey')
-            ->setCollector('fake')
+            ->setCollectorStorage('fake')
             ->addCondition('noProxy')
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;

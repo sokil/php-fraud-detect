@@ -62,7 +62,7 @@ class Detector
         return $this;
     }
     
-    public function setCollector($type, $callable = null)
+    public function setCollectorStorage($type, $callable = null)
     {
         $this->collectorType = $type;
         
