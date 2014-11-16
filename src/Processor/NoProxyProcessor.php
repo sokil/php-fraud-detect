@@ -1,8 +1,8 @@
 <?php
 
-namespace Sokil\FraudDetector\Condition;
+namespace Sokil\FraudDetector\Processor;
 
-class NoProxy extends \Sokil\FraudDetector\AbstractCondition
+class NoProxyProcessor extends \Sokil\FraudDetector\AbstractProcessor
 {
     private $proxyHeaders = array(
         'CLIENT_IP',
@@ -22,8 +22,8 @@ class NoProxy extends \Sokil\FraudDetector\AbstractCondition
         'VIA',
     );
     
-    public function isPassed()
+    public function check()
     {
-        return (bool) array_intersect(array_keys($_SERVER), $this->proxyHeaders);
+        return !array_intersect(array_keys($_SERVER), $this->proxyHeaders);
     }
 }

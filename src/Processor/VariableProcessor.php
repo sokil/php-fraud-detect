@@ -1,8 +1,8 @@
 <?php
 
-namespace Sokil\FraudDetector\Condition;
+namespace Sokil\FraudDetector\Processor;
 
-class Variable extends \Sokil\FraudDetector\AbstractCondition
+class VariableProcessor extends \Sokil\FraudDetector\AbstractProcessor
 {
     const CONDITION_EXISTS      = 'exists';
     const CONDITION_EQUALS      = '==';
@@ -31,7 +31,7 @@ class Variable extends \Sokil\FraudDetector\AbstractCondition
         return array_key_exists($this->name, $GLOBALS);
     }
     
-    public function isPassed() 
+    public function check() 
     {        
         foreach($this->conditionList as $condition => $conditionValue) {
             switch($condition) {

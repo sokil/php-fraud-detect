@@ -8,41 +8,21 @@ class Detector
     const STATE_PASSED      = 'checkPassed';
     const STATE_FAILED      = 'checkFailed';
     
-    private $conditionNamespaces = array(
-        '\Sokil\FraudDetector\Condition',
-    );
-    
-    private $collectorNamespaces = array(
-        '\Sokil\FraudDetector\Collector',
+    private $processorNamespaces = array(
+        '\Sokil\FraudDetector\Processor',
     );
     
     private $state = self::STATE_UNCHECKED;
     
     private $handlers = array();
     
-    private $conditions = array();
-    
-    private $collectorType;
-    
-    private $collectorConfiguratorCallable;
-    
-    private $collector;
+    private $processors = array();
     
     /**
      *
      * @var mixed key to identify unique user
      */
     private $key;
-    
-    private $requestNumber = 1;
-    
-    private $timeInterval = 1;
-    
-    public function __construct()
-    {
-        // default key is ip of user
-        $this->key = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
-    }
     
     /**
      * Key that uniquely identify user
@@ -55,64 +35,13 @@ class Detector
         return $this;
     }
     
-    public function setRequestRate($requestNumber, $timeInterval)
+    public function getKey()
     {
-        $this->requestNumber = $requestNumber;
-        $this->timeInterval = $timeInterval;
-        return $this;
-    }
-    
-    public function setCollectorStorage($type, $callable = null)
-    {
-        $this->collectorType = $type;
-        
-        if($callable && is_callable($callable)) {
-            $this->collectorConfiguratorCallable = $callable;
+        if(!$this->key) {
+            $this->key = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
         }
         
-        $this->collector = null;
-        
-        return $this;
-    }
-    
-    /**
-     * Factory method to create new collector
-     * 
-     * @param string $type Type of storage
-     * @return \Sokil\FraudDetector\AbstractCollector
-     * @throws \Exception
-     */
-    private function getCollector()
-    {
-        if($this->collector) {
-            return $this->collector;
-        }
-        
-        $className = ucfirst($this->collectorType) . 'Collector';
-        
-        foreach($this->collectorNamespaces as $namespace) {
-            
-            $fullyQualifiedClassName = $namespace . '\\' . $className;
-            if(!class_exists($fullyQualifiedClassName)) {
-                continue;
-            }
-            
-            $this->collector = new $fullyQualifiedClassName($this->key, $this->requestNumber, $this->timeInterval);
-
-            // configure
-            if($this->collectorConfiguratorCallable) {
-                call_user_func($this->collectorConfiguratorCallable, $this->collector);
-            }
-
-            return $this->collector;
-        }
-        
-        throw new \Exception('Collector ' . $this->collectorType . ' not found');
-    }
-    
-    public function setBlackListStorage($name)
-    {
-        
+        return $this->key;
     }
     
     /**
@@ -121,18 +50,11 @@ class Detector
     public function check()
     {
         // check all conditions
-        foreach($this->conditions as $condition) {
-            $state = $condition->isPassed()
-                ? self::STATE_PASSED
-                : self::STATE_FAILED;
-
-            $this->setState($state);
-        }
-        
-        // collect stat
-        if($this->isPassed()) {
-            if(!$this->getCollector()->collect()) {
-                // ban key
+        /* @var $processor \Sokil\FraudDetector\AbstractProcessor */
+        foreach($this->processors as $processor) {
+            if($processor->process()) {
+                $this->setState(self::STATE_PASSED);
+            } else {
                 $this->setState(self::STATE_FAILED);
             }
         }
@@ -144,27 +66,27 @@ class Detector
      * Factory method to create new check condition
      * 
      * @param string $name name of check condition
-     * @return \Sokil\FraudDetector\AbstractCondition
+     * @return \Sokil\FraudDetector\AbstractProcessor
      * @throws \Exception
      */
-    private function createCondition($name)
+    private function createProcessor($name)
     {
-        $className = ucfirst($name);
+        $className = ucfirst($name) . 'Processor';
         
-        foreach($this->conditionNamespaces as $namespace) {
+        foreach($this->processorNamespaces as $namespace) {
             $fullyQualifiedClassName = $namespace . '\\' . $className;
             if(class_exists($fullyQualifiedClassName)) {
-                return new $fullyQualifiedClassName();
+                return new $fullyQualifiedClassName($this);
             }
         }
         
         throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
     }
     
-    public function addCondition($name, $callable = null)
+    public function addProcessor($name, $callable = null)
     {        
         // create condition
-        $condition = $this->createCondition($name);
+        $condition = $this->createProcessor($name);
         
         // configure condition
         if($callable && is_callable($callable)) {
@@ -172,7 +94,7 @@ class Detector
         }
         
         // add to list
-        $this->conditions[] = $condition;
+        $this->processors[] = $condition;
         
         return $this;
     }

@@ -4,7 +4,7 @@ namespace Sokil\FraudDetector;
 
 class DetectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCheck_Variable()
+    public function testCheck()
     {
         $detector = new Detector();
         
@@ -15,14 +15,11 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector
             ->setKey('someKey')
-            ->setRequestRate(5, 1)
-            ->setCollectorStorage('fake')
-            ->setBlackListStorage('fake')
-            ->addCondition('variable', function($condition) {
-                $condition
-                    ->setName('globalVariable')
-                    ->greater(40)
-                    ->lower(44);
+            ->addProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+                /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
+                $processor
+                    ->setRequestRate(5, 1)
+                    ->setCollector('fake');
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
@@ -38,30 +35,5 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector->check();
         $this->assertFalse($status->ok);    
-    }
-    
-    public function testCheck_Proxy()
-    {
-        $detector = new Detector();
-        $that = $this;
-        
-        $status = new \stdClass();
-        $status->ok = false;
-        
-        $_SERVER['HTTP_X_FORWARDED_FOR'] = '10.0.0.1';
-        
-        $detector
-            ->setKey('someKey')
-            ->setCollectorStorage('fake')
-            ->addCondition('noProxy')
-            ->onCheckPassed(function() use($status) {
-                $status->ok = true;
-            })
-            ->onCheckFailed(function() use($that) {
-                $that->fail('Check must pass, but fail');
-            })
-            ->check();
-            
-        $this->assertTrue($status->ok);
     }
 }

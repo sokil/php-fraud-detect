@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\FraudDetector;
+namespace Sokil\FraudDetector\Processor\RequestRate;
 
 abstract class AbstractCollector
 {
@@ -32,4 +32,6 @@ abstract class AbstractCollector
     }
     
     abstract public function collect();
+    
+    abstract public function isRateLimitExceed();
 }
