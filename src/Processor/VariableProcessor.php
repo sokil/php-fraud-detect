@@ -31,7 +31,7 @@ class VariableProcessor extends \Sokil\FraudDetector\AbstractProcessor
         return array_key_exists($this->name, $GLOBALS);
     }
     
-    public function check() 
+    public function isPassed() 
     {        
         foreach($this->conditionList as $condition => $conditionValue) {
             switch($condition) {
