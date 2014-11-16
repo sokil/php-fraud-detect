@@ -44,7 +44,6 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $status = new \stdClass();
         $status->ok = null;
         
-        $GLOBALS['globalVariable'] = 42;
         
         $detector
             ->setKey('someKey')
@@ -57,9 +56,42 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
             })
             ->onCheckFailed(function() use($status) {
                 $status->ok = false;
-            })
-            ->check();
+            });
             
+        $GLOBALS['globalVariable'] = 42;
+        $detector->check();    
         $this->assertTrue($status->ok);   
+        
+        $GLOBALS['globalVariable'] = 43;
+        $detector->check();    
+        $this->assertFalse($status->ok); 
+    }
+    
+    public function testCheck_NoProxy()
+    {
+        $detector = new Detector();
+        
+        $status = new \stdClass();
+        $status->ok = null;
+        
+        $GLOBALS['globalVariable'] = 42;
+        
+        $detector
+            ->setKey('someKey')
+            ->addProcessor('noProxy')
+            ->onCheckPassed(function() use($status) {
+                $status->ok = true;
+            })
+            ->onCheckFailed(function() use($status) {
+                $status->ok = false;
+            });
+            
+        $detector->check();
+        $this->assertTrue($status->ok);   
+            
+        $_SERVER['VIA'] = '10.0.0.1';
+        $detector->check();
+        $this->assertFalse($status->ok);   
+            
     }
 }

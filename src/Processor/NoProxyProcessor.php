@@ -22,7 +22,7 @@ class NoProxyProcessor extends \Sokil\FraudDetector\AbstractProcessor
         'VIA',
     );
     
-    public function check()
+    public function isPassed()
     {
         return !array_intersect(array_keys($_SERVER), $this->proxyHeaders);
     }
