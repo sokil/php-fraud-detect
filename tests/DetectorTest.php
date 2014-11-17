@@ -94,4 +94,29 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($status->ok);   
             
     }
+    
+    public function testCheck_BlackList()
+    {
+        $detector = new Detector();
+        
+        $status = new \stdClass();
+        $status->ok = null;
+        
+        $detector
+            ->setKey('someKey')
+            ->addProcessor('blackList', function($processor) {
+                /* @var $processor \Sokil\FraudDetector\Processor\BlackListProcessor */
+                $processor->setStorage('fake');
+            })
+            ->onCheckPassed(function() use($status) {
+                $status->ok = true;
+            })
+            ->onCheckFailed(function() use($status) {
+                $status->ok = false;
+            });
+            
+        $detector->check();
+        $this->assertTrue($status->ok);
+            
+    }
 }
