@@ -20,9 +20,20 @@ class Detector
     
     /**
      *
+     * @var \SplPriorityQueue
+     */
+    private $processorPriority;
+    
+    /**
+     *
      * @var mixed key to identify unique user
      */
     private $key;
+    
+    public function __construct()
+    {
+        $this->processorPriority = new \SplPriorityQueue;
+    }
     
     /**
      * Key that uniquely identify user
@@ -91,7 +102,7 @@ class Detector
      * @param callable $callable configurator callable
      * @return \Sokil\FraudDetector\Detector
      */
-    public function addProcessor($name, $callable = null)
+    public function addProcessor($name, $callable = null, $priority = 0)
     {        
         // create condition
         $condition = $this->createProcessor($name);
@@ -103,6 +114,8 @@ class Detector
         
         // add to list
         $this->processors[$name] = $condition;
+        
+        $this->processorPriority->insert($name, $priority)
         
         return $this;
     }
