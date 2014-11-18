@@ -15,6 +15,12 @@ class BlackListProcessor extends \Sokil\FraudDetector\AbstractProcessor
         return !$this->storage->isStored($this->detector->getKey());
     }
     
+    public function store($key)
+    {
+        $this->storage->store($key);
+        return $this;
+    }
+    
     public function setStorage($type, $configuratorCallable = null)
     {        
         $className = '\Sokil\FraudDetector\Processor\BlackList\Storage\\' . ucfirst($type) . 'Storage';
