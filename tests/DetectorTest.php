@@ -119,4 +119,25 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($status->ok);
             
     }
+    
+    public function testGetProcessor()
+    {
+        $detector = new Detector();
+        $detector->addProcessor('blackList');
+        
+        $this->assertInstanceOf(
+            '\Sokil\FraudDetector\Processor\BlackListProcessor',
+            $detector->getProcessor('blackList')
+        );
+    }
+    
+    public function testIsProcessorConfigured()
+    {
+        $detector = new Detector();
+        $detector->addProcessor('blackList');
+        
+        $this->assertTrue($detector->isProcessorConfigured('blackList'));
+        
+        $this->assertFalse($detector->isProcessorConfigured('SOME_UNEXISTED_PROCESSOR'));
+    }
 }

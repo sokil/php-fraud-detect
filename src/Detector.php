@@ -83,6 +83,14 @@ class Detector
         throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
     }
     
+    /**
+     * Add processor identified by its name.
+     * If processor already added, it will be replaced by new instance.
+     * 
+     * @param string $name name of processor
+     * @param callable $callable configurator callable
+     * @return \Sokil\FraudDetector\Detector
+     */
     public function addProcessor($name, $callable = null)
     {        
         // create condition
@@ -94,9 +102,29 @@ class Detector
         }
         
         // add to list
-        $this->processors[] = $condition;
+        $this->processors[$name] = $condition;
         
         return $this;
+    }
+    
+    /**
+     * 
+     * @param type $name
+     * @return \Sokil\FraudDetector\AbstractProcessor
+     * @throws \Exception
+     */
+    public function getProcessor($name)
+    {
+        if(!$this->isProcessorConfigured($name)) {
+            throw new \Exception('Processor ' . $name . ' not found');
+        }
+        
+        return $this->processors[$name];
+    }
+    
+    public function isProcessorConfigured($name)
+    {
+        return isset($this->processors[$name]);
     }
     
     public function onCheckPassed($callable)
