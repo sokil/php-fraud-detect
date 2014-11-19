@@ -15,7 +15,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector
             ->setKey('someKey')
-            ->addProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
                 $processor
                     ->setRequestRate(5, 1)
@@ -47,7 +47,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector
             ->setKey('someKey')
-            ->addProcessor('variable', function(\Sokil\FraudDetector\Processor\VariableProcessor $processor) {
+            ->declareProcessor('variable', function(\Sokil\FraudDetector\Processor\VariableProcessor $processor) {
                 /* @var $processor \Sokil\FraudDetector\Processor\VariableProcessor */
                 $processor->setName('globalVariable')->equals(42);
             })
@@ -78,7 +78,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector
             ->setKey('someKey')
-            ->addProcessor('noProxy')
+            ->declareProcessor('noProxy')
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
             })
@@ -104,7 +104,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         
         $detector
             ->setKey('someKey')
-            ->addProcessor('blackList', function($processor) {
+            ->declareProcessor('blackList', function($processor) {
                 /* @var $processor \Sokil\FraudDetector\Processor\BlackListProcessor */
                 $processor->setStorage('fake');
             })
@@ -123,7 +123,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
     public function testGetProcessor()
     {
         $detector = new Detector();
-        $detector->addProcessor('blackList');
+        $detector->declareProcessor('blackList');
         
         $this->assertInstanceOf(
             '\Sokil\FraudDetector\Processor\BlackListProcessor',
@@ -134,7 +134,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
     public function testIsProcessorConfigured()
     {
         $detector = new Detector();
-        $detector->addProcessor('blackList');
+        $detector->declareProcessor('blackList');
         
         $this->assertTrue($detector->isProcessorConfigured('blackList'));
         

@@ -16,13 +16,23 @@ class Detector
     
     private $handlers = array();
     
-    private $processors = array();
+    /**
+     * Processor instances
+     * @var array
+     */
+    private $processorList = array();
     
     /**
      *
      * @var \SplPriorityQueue
      */
-    private $processorPriority;
+    private $processorPriorityList;
+    
+    /**
+     * List of processor declarations used to initiate processor
+     * @var array
+     */
+    private $processorDeclarationList = array();
     
     /**
      *
@@ -32,7 +42,7 @@ class Detector
     
     public function __construct()
     {
-        $this->processorPriority = new \SplPriorityQueue;
+        $this->processorPriorityList = new \SplPriorityQueue;
     }
     
     /**
@@ -62,8 +72,8 @@ class Detector
     {
         // check all conditions
         /* @var $processor \Sokil\FraudDetector\AbstractProcessor */
-        foreach($this->processors as $processor) {
-            if($processor->process()) {
+        foreach($this->processorPriorityList as $processorName) {
+            if($this->getProcessor($processorName)->process()) {
                 $this->setState(self::STATE_PASSED);
             } else {
                 $this->setState(self::STATE_FAILED);
@@ -102,20 +112,10 @@ class Detector
      * @param callable $callable configurator callable
      * @return \Sokil\FraudDetector\Detector
      */
-    public function addProcessor($name, $callable = null, $priority = 0)
-    {        
-        // create condition
-        $condition = $this->createProcessor($name);
-        
-        // configure condition
-        if($callable && is_callable($callable)) {
-            call_user_func($callable, $condition);
-        }
-        
-        // add to list
-        $this->processors[$name] = $condition;
-        
-        $this->processorPriority->insert($name, $priority)
+    public function declareProcessor($name, $callable = null, $priority = 0)
+    {
+        $this->processorDeclarationList[$name] = $callable;
+        $this->processorPriorityList->insert($name, $priority);
         
         return $this;
     }
@@ -128,16 +128,35 @@ class Detector
      */
     public function getProcessor($name)
     {
+        // return if already initialised
+        if(isset($this->processorList[$name])) {
+            return $this->processorList[$name];
+        }
+        
+        // check if processor declared
         if(!$this->isProcessorConfigured($name)) {
             throw new \Exception('Processor ' . $name . ' not found');
         }
         
-        return $this->processors[$name];
+        // get declaration of processor
+        $configuratorCallable = $this->processorDeclarationList[$name];
+        
+        // create processor
+        $processor = $this->createProcessor($name);
+        
+        // configure condition
+        if($configuratorCallable && is_callable($configuratorCallable)) {
+            call_user_func($configuratorCallable, $processor);
+        }
+        
+        $this->processorList[$name] = $processor;
+        
+        return $this->processorList[$name];
     }
     
     public function isProcessorConfigured($name)
     {
-        return isset($this->processors[$name]);
+        return isset($this->processorDeclarationList[$name]);
     }
     
     public function onCheckPassed($callable)
