@@ -130,14 +130,4 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
             $detector->getProcessor('blackList')
         );
     }
-    
-    public function testIsProcessorConfigured()
-    {
-        $detector = new Detector();
-        $detector->declareProcessor('blackList');
-        
-        $this->assertTrue($detector->isProcessorConfigured('blackList'));
-        
-        $this->assertFalse($detector->isProcessorConfigured('SOME_UNEXISTED_PROCESSOR'));
-    }
 }

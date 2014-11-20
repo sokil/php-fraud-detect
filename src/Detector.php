@@ -8,31 +8,9 @@ class Detector
     const STATE_PASSED      = 'checkPassed';
     const STATE_FAILED      = 'checkFailed';
     
-    private $processorNamespaces = array(
-        '\Sokil\FraudDetector\Processor',
-    );
-    
     private $state = self::STATE_UNCHECKED;
     
     private $handlers = array();
-    
-    /**
-     * Processor instances
-     * @var array
-     */
-    private $processorList = array();
-    
-    /**
-     *
-     * @var \SplPriorityQueue
-     */
-    private $processorPriorityList;
-    
-    /**
-     * List of processor declarations used to initiate processor
-     * @var array
-     */
-    private $processorDeclarationList = array();
     
     /**
      *
@@ -40,9 +18,15 @@ class Detector
      */
     private $key;
     
+    /**
+     *
+     * @var \Sokil\FraudDetector\ProcessorList
+     */
+    private $processorList;
+    
     public function __construct()
     {
-        $this->processorPriorityList = new \SplPriorityQueue;
+        $this->processorList = new ProcessorList;
     }
     
     /**
@@ -72,8 +56,8 @@ class Detector
     {
         // check all conditions
         /* @var $processor \Sokil\FraudDetector\AbstractProcessor */
-        foreach($this->processorPriorityList as $processorName) {
-            if($this->getProcessor($processorName)->process()) {
+        foreach($this->processorList as $processor) {
+            if($processor->process()) {
                 $this->setState(self::STATE_PASSED);
             } else {
                 $this->setState(self::STATE_FAILED);
@@ -81,27 +65,6 @@ class Detector
         }
 
         $this->callDelayedHandlers();
-    }
-     
-    /**
-     * Factory method to create new check condition
-     * 
-     * @param string $name name of check condition
-     * @return \Sokil\FraudDetector\AbstractProcessor
-     * @throws \Exception
-     */
-    private function createProcessor($name)
-    {
-        $className = ucfirst($name) . 'Processor';
-        
-        foreach($this->processorNamespaces as $namespace) {
-            $fullyQualifiedClassName = $namespace . '\\' . $className;
-            if(class_exists($fullyQualifiedClassName)) {
-                return new $fullyQualifiedClassName($this);
-            }
-        }
-        
-        throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
     }
     
     /**
@@ -114,49 +77,7 @@ class Detector
      */
     public function declareProcessor($name, $callable = null, $priority = 0)
     {
-        $this->processorDeclarationList[$name] = $callable;
-        $this->processorPriorityList->insert($name, $priority);
         
-        return $this;
-    }
-    
-    /**
-     * 
-     * @param type $name
-     * @return \Sokil\FraudDetector\AbstractProcessor
-     * @throws \Exception
-     */
-    public function getProcessor($name)
-    {
-        // return if already initialised
-        if(isset($this->processorList[$name])) {
-            return $this->processorList[$name];
-        }
-        
-        // check if processor declared
-        if(!$this->isProcessorConfigured($name)) {
-            throw new \Exception('Processor ' . $name . ' not found');
-        }
-        
-        // get declaration of processor
-        $configuratorCallable = $this->processorDeclarationList[$name];
-        
-        // create processor
-        $processor = $this->createProcessor($name);
-        
-        // configure condition
-        if($configuratorCallable && is_callable($configuratorCallable)) {
-            call_user_func($configuratorCallable, $processor);
-        }
-        
-        $this->processorList[$name] = $processor;
-        
-        return $this->processorList[$name];
-    }
-    
-    public function isProcessorConfigured($name)
-    {
-        return isset($this->processorDeclarationList[$name]);
     }
     
     public function onCheckPassed($callable)
