@@ -4,6 +4,8 @@ namespace Sokil\FraudDetector;
 
 class ProcessorList implements \Iterator, \Countable
 {
+    private $detector;
+    
     private $processorNamespaces = array(
         '\Sokil\FraudDetector\Processor',
     );
@@ -22,9 +24,14 @@ class ProcessorList implements \Iterator, \Countable
     
     private $lastSequence = 0;
     
+    public function __construct(Detector $detector)
+    {
+        $this->detector = $detector;
+    }
+    
     public function registerNamespace($namespace)
     {
-        $this->processorNamespaces[] = $namespace;
+        $this->processorNamespaces[] = rtrim($namespace, '\\');
         return $this;
     }
     
@@ -61,7 +68,7 @@ class ProcessorList implements \Iterator, \Countable
                 continue;
             }
             
-            $processor =  new $fullyQualifiedClassName($this);
+            $processor =  new $fullyQualifiedClassName($this->detector);
 
             // get declaration of processor
             $configuratorCallable = $this->processorDeclarationList[$name]['callable'];
@@ -107,10 +114,10 @@ class ProcessorList implements \Iterator, \Countable
     {
         uasort($this->processorDeclarationList, function($declaration1, $declaration2) {
             if($declaration1['priority'] === $declaration2['priority']) {
-                return $declaration1['sequence'] > $declaration2['sequence'] ? 1 : -1;
+                return $declaration1['sequence'] < $declaration2['sequence'] ? 1 : -1;
             }
             
-            return $declaration1['priority'] > $declaration2['priority'] ? 1 : -1;
+            return $declaration1['priority'] < $declaration2['priority'] ? 1 : -1;
         });
         
         reset($this->processorDeclarationList);

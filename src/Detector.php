@@ -26,7 +26,7 @@ class Detector
     
     public function __construct()
     {
-        $this->processorList = new ProcessorList;
+        $this->processorList = new ProcessorList($this);
     }
     
     /**
@@ -77,7 +77,8 @@ class Detector
      */
     public function declareProcessor($name, $callable = null, $priority = 0)
     {
-        
+        $this->processorList->declareProcessor($name, $callable, $priority);
+        return $this;
     }
     
     public function onCheckPassed($callable)

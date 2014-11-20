@@ -6,26 +6,27 @@ class ProcessorListTest extends \PHPUnit_Framework_TestCase
 {
     public function testDeclareProcessor()
     {
-        $list = new ProcessorList;
+        $list = new ProcessorList(new Detector);
+        $list->registerNamespace('\Sokil\FraudDetector');
         
-        $list->declareProcessor('someProcessor10', function() {}, 10);
+        $list->declareProcessor('some10', function() {}, 10);
         
-        $list->declareProcessor('someProcessor100', function() {}, 100);
+        $list->declareProcessor('some100', function() {}, 100);
         
-        $list->declareProcessor('someProcessor100', function() {}, 1000);
+        $list->declareProcessor('some1000', function() {}, 1000);
         
-        $this->assertEquals(1000, $list->current());
+        $this->assertEquals('some1000', $list->key());
         $list->next();
         
-        $this->assertEquals(100, $list->current());
+        $this->assertEquals('some100', $list->key());
         $list->next();
         
-        $this->assertEquals(10, $list->current());
+        $this->assertEquals('some10', $list->key());
     }
     
     public function testIsProcessorConfigured()
     {
-        $list = new ProcessorList();
+        $list = new ProcessorList(new Detector);
         
         $list->declareProcessor('blackList');
         
@@ -35,10 +36,10 @@ class ProcessorListTest extends \PHPUnit_Framework_TestCase
     }
 }
 
-class SomeProcessor10 extends AbstractProcessor {
+class Some10Processor extends AbstractProcessor {
     public function isPassed() { return true; }
 }
 
-class SomeProcessor100 extends SomeProcessor10 {}
+class Some100Processor extends Some10Processor {}
 
-class SomeProcessor1000 extends SomeProcessor100 {}
+class Some1000Processor extends Some100Processor {}
