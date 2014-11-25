@@ -7,7 +7,9 @@
             "email": "dmytro.sokil@gmail.com"
         }
     ],
-    "require": {},
+    "require": {
+        "sokil/php-prioritylist": "0.0.1"
+    },
     "autoload": {
         "psr-4": {
             "Sokil\\FraudDetector\\": "src/"

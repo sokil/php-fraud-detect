@@ -1,0 +1,50 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "288e5d24837994842df2c4dca8f87ec7",
+    "packages": [
+        {
+            "name": "sokil/php-prioritylist",
+            "version": "0.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sokil/php-prioritylist.git",
+                "reference": "ff76c4b91fd832b6e180ff17ba58c6fc23c00911"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sokil/php-prioritylist/zipball/ff76c4b91fd832b6e180ff17ba58c6fc23c00911",
+                "reference": "ff76c4b91fd832b6e180ff17ba58c6fc23c00911",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Sokil\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dmytro Sokil",
+                    "email": "dmytro.sokil@gmail.com"
+                }
+            ],
+            "description": "Priority List",
+            "time": "2014-11-25 07:21:19"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "platform": [],
+    "platform-dev": []
+}
