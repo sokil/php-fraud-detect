@@ -95,6 +95,44 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testCheck_AddToBlackListOnRateExceed()
+    {
+        $detector = new Detector();
+
+        $status = new \stdClass();
+        $status->ok = null;
+
+        $detector
+            ->setKey('someKey')
+            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+                /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
+                $processor
+                    ->setRequestRate(5, 1)
+                    ->banOnRateExceed()
+                    ->setCollector('fake');
+            })
+            ->declareProcessor('blackList', function($processor) {
+                /* @var $processor \Sokil\FraudDetector\Processor\BlackListProcessor */
+                $processor->setStorage('fake');
+            })
+            ->onCheckPassed(function() use($status) {
+                $status->ok = true;
+            })
+            ->onCheckFailed(function() use($status) {
+                $status->ok = false;
+            });
+
+        for($i = 0; $i < 5; $i++) {
+            $detector->check();
+            $this->assertTrue($status->ok);
+            $this->assertFalse($detector->getProcessor('blackList')->isBanned());
+        }
+
+        $detector->check();
+        $this->assertFalse($status->ok);
+        $this->assertTrue($detector->getProcessor('blackList')->isBanned());
+    }
+
     public function testCheck_BlackList()
     {
         $detector = new Detector();
