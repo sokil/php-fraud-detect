@@ -8,7 +8,7 @@
         }
     ],
     "require": {
-        "sokil/php-list": "0.0.2"
+        "sokil/php-list": "0.*"
     },
     "autoload": {
         "psr-4": {

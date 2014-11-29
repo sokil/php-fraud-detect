@@ -4,26 +4,30 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "288e5d24837994842df2c4dca8f87ec7",
+    "hash": "1bfb3637cbe6c9d6ff32d33568dc03d6",
     "packages": [
         {
-            "name": "sokil/php-prioritylist",
-            "version": "0.0.1",
+            "name": "sokil/php-list",
+            "version": "0.0.5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sokil/php-prioritylist.git",
-                "reference": "ff76c4b91fd832b6e180ff17ba58c6fc23c00911"
+                "url": "https://github.com/sokil/php-list.git",
+                "reference": "99cb3cf5aa608e09b507bac956213067c1fa83fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sokil/php-prioritylist/zipball/ff76c4b91fd832b6e180ff17ba58c6fc23c00911",
-                "reference": "ff76c4b91fd832b6e180ff17ba58c6fc23c00911",
+                "url": "https://api.github.com/repos/sokil/php-list/zipball/99cb3cf5aa608e09b507bac956213067c1fa83fc",
+                "reference": "99cb3cf5aa608e09b507bac956213067c1fa83fc",
                 "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*",
+                "satooshi/php-coveralls": "dev-master"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Sokil\\": "src/"
+                    "Sokil\\DataType\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -36,8 +40,8 @@
                     "email": "dmytro.sokil@gmail.com"
                 }
             ],
-            "description": "Priority List",
-            "time": "2014-11-25 07:21:19"
+            "description": "Lists",
+            "time": "2014-11-28 20:38:20"
         }
     ],
     "packages-dev": [],
