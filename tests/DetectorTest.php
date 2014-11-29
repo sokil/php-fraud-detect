@@ -156,6 +156,11 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $detector->check();
         $this->assertTrue($status->ok);
 
+        $detector->getProcessor('blackList')->ban();
+
+        $detector->check();
+        $this->assertFalse($status->ok);
+
     }
 
     public function testGetProcessor()

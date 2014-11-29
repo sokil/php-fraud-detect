@@ -6,16 +6,16 @@ use Sokil\FraudDetector\Processor\BlackList\AbstractStorage;
 
 class FakeStorage extends AbstractStorage
 {
-    static $fakeStorage = array();
-    
+    private $fakeStorage = array();
+
     public function store($key)
     {
-        self::$fakeStorage[] = $key;
+        $this->fakeStorage[] = $key;
         return $this;
     }
-    
+
     public function isStored($key)
     {
-        return in_array($key, self::$fakeStorage);
+        return in_array($key, $this->fakeStorage);
     }
 }
