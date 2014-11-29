@@ -37,9 +37,7 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
             }
 
             // add key to black list
-            $this->detector
-                ->getProcessor('blackList')
-                ->store($this->detector->getKey());
+            $this->detector->getProcessor('blackList')->ban();
         }
 
         return $this;
