@@ -43,7 +43,7 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
 
     public function setCollector($type, $configuratorCallable = null)
     {
-        $className = '\Sokil\FraudDetector\Processor\RequestRate\Collector\\' . ucfirst($type) . 'Collector';
+        $className = '\Sokil\FraudDetector\Collector\\' . ucfirst($type) . 'Collector';
 
         if(!class_exists($className)) {
             throw new \Exception('Collector ' . $type . ' not found');
