@@ -32,8 +32,12 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
         return $this;
     }
 
-
-
+    /**
+     * Define time interval and maximum allowed request number on it
+     * @param int $requestNumber maximum number of allowed requests
+     * @param int $timeInterval time interval in seconds
+     * @return \Sokil\FraudDetector\Processor\RequestRateProcessor
+     */
     public function setRequestRate($requestNumber, $timeInterval)
     {
         $this->requestNumber = $requestNumber;
