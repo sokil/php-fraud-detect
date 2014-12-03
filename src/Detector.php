@@ -3,6 +3,7 @@
 namespace Sokil\FraudDetector;
 
 use Sokil\DataType\PriorityList;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Detector
 {
@@ -32,9 +33,16 @@ class Detector
         '\Sokil\FraudDetector\Processor',
     );
 
+    /**
+     *
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
     public function __construct()
     {
         $this->processorDeclarationList = new PriorityList();
+        $this->eventDispatcher = new EventDispatcher();
     }
 
     /**
@@ -215,6 +223,24 @@ class Detector
             $this->callHandler($callable);
         }
 
+        return $this;
+    }
+
+    public function subscribe($eventName, $callable, $priority = 0)
+    {
+        $this->eventDispatcher->addListener($eventName, $callable, $priority);
+        return $this;
+    }
+
+    public function trigger($eventName, $target = null)
+    {
+        $event = new Event();
+
+        if($target) {
+            $event->setTarget($target);
+        }
+
+        $this->eventDispatcher->dispatch($eventName, $event);
         return $this;
     }
 }

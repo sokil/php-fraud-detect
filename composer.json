@@ -8,7 +8,8 @@
         }
     ],
     "require": {
-        "sokil/php-list": "0.*"
+        "sokil/php-list": "0.*",
+        "symfony/event-dispatcher": "2.5.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
