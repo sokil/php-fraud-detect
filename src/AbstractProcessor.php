@@ -10,9 +10,13 @@ abstract class AbstractProcessor
      */
     protected $detector;
 
+    protected function init() {}
+
     public function __construct(Detector $detector)
     {
         $this->detector = $detector;
+
+        $this->init();
     }
 
     public function process()

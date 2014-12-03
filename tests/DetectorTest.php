@@ -108,12 +108,13 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
                 $processor
                     ->setRequestRate(5, 1)
-                    ->banOnRateExceed()
                     ->setCollector('fake');
             })
             ->declareProcessor('blackList', function($processor) {
                 /* @var $processor \Sokil\FraudDetector\Processor\BlackListProcessor */
-                $processor->setStorage('fake');
+                $processor
+                    ->setStorage('fake')
+                    ->banOnRateExceed();
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;

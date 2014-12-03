@@ -14,8 +14,6 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
      */
     private $collector;
 
-    private $banOnRateExceed = false;
-
     protected function isPassed()
     {
         return !$this->collector->isRateLimitExceed();
@@ -29,25 +27,12 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
 
     protected function afterCheckFailed()
     {
-        if($this->banOnRateExceed) {
-
-            // check if black list configured
-            if(!$this->detector->isProcessorDeclared('blackList')) {
-                throw new \Exception('Black list not configured');
-            }
-
-            // add key to black list
-            $this->detector->getProcessor('blackList')->ban();
-        }
+        $this->detector->trigger('requestRate.rateExceed');
 
         return $this;
     }
 
-    public function banOnRateExceed()
-    {
-        $this->banOnRateExceed = true;
-        return $this;
-    }
+
 
     public function setRequestRate($requestNumber, $timeInterval)
     {

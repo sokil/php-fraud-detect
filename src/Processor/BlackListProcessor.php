@@ -10,6 +10,21 @@ class BlackListProcessor extends \Sokil\FraudDetector\AbstractProcessor
      */
     private $storage;
 
+    private $banOnRateExceed = false;
+
+    public function init()
+    {
+        $self = $this;
+
+        // rate exceed event handler
+        $this->detector->subscribe('requestRate.rateExceed', function() use($self) {
+            // ban on rate exceed
+            if($self->banOnRateExceed) {
+                $self->ban();
+            }
+        });
+    }
+
     protected function isPassed()
     {
         return !$this->isBanned();
@@ -24,6 +39,12 @@ class BlackListProcessor extends \Sokil\FraudDetector\AbstractProcessor
     public function isBanned()
     {
         return $this->storage->isStored($this->detector->getKey());
+    }
+
+    public function banOnRateExceed()
+    {
+        $this->banOnRateExceed = true;
+        return $this;
     }
 
     public function setStorage($type, $configuratorCallable = null)
