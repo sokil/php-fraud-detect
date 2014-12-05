@@ -8,10 +8,11 @@ php:
 
 before_script:
   - composer install --dev --no-interaction
-  
+  - mysql -uroot -e "CREATE DATABASE IF NOT EXISTS test";
+
 script:
   - mkdir -p build/logs
   - phpunit --bootstrap ./tests/bootstrap.php -c tests/phpunit.xml --coverage-clover build/logs/clover.xml tests
-  
+
 after_script:
   - php ./vendor/bin/coveralls -v

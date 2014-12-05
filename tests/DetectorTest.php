@@ -73,6 +73,45 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($status->ok);
     }
 
+    public function testCheck_RequestRate_PdoMysqlCollector()
+    {
+        $detector = new Detector();
+
+        $status = new \stdClass();
+        $status->ok = null;
+
+        $detector
+            ->setKey('someKey')
+            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+                /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
+                $processor
+                    ->setRequestRate(5, 1)
+                    ->setCollector('pdo_mysql', function($collector) {
+                        /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
+
+                        $pdo = new \PDO('mysql:host=localhost;dbname=test', 'root', '');
+                        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                        $collector
+                            ->setStorage($pdo)
+                            ->setTableName('test_collector');
+                    });
+            })
+            ->onCheckPassed(function() use($status) {
+                $status->ok = true;
+            })
+            ->onCheckFailed(function() use($status) {
+                $status->ok = false;
+            });
+
+        for($i = 0; $i < 5; $i++) {
+            $detector->check();
+            $this->assertTrue($status->ok);
+        }
+
+        $detector->check();
+        $this->assertFalse($status->ok);
+    }
+
     public function testCheck_Variable()
     {
         $detector = new Detector();

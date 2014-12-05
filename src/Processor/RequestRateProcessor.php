@@ -45,12 +45,23 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
         return $this;
     }
 
+    private function getCollectorClassByType($type)
+    {
+        if(false == strpos($type, '_')) {
+            $className = ucfirst($type);
+        } else {
+            $className = implode('', array_map('ucfirst', explode('_', $type)));
+        }
+
+        return '\Sokil\FraudDetector\Collector\\' . $className . 'Collector';
+    }
+
     public function setCollector($type, $configuratorCallable = null)
     {
-        $className = '\Sokil\FraudDetector\Collector\\' . ucfirst($type) . 'Collector';
+        $className = $this->getCollectorClassByType($type);
 
         if(!class_exists($className)) {
-            throw new \Exception('Collector ' . $type . ' not found');
+            throw new \Exception('Collector ' . $className . ' not found');
         }
 
         $this->collector = new $className(
