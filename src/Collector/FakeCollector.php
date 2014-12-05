@@ -16,7 +16,7 @@ class FakeCollector extends AbstractCollector
         }
 
         // is in time slot
-        if($this->keyList[$this->key]['time'] + $this->timeInterval < time()) {
+        if($this->keyList[$this->key]['expired'] < time()) {
             return false;
         }
 
@@ -29,7 +29,7 @@ class FakeCollector extends AbstractCollector
         if(isset($this->keyList[$this->key])) {
             $this->keyList[$this->key]['requestNum']++;
         } else {
-            $this->keyList[$this->key] = array('time' => time(), 'requestNum' => 1);
+            $this->keyList[$this->key] = array('expired' => time() + $this->timeInterval, 'requestNum' => 1);
         }
     }
 }
