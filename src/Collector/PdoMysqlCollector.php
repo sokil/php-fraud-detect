@@ -54,7 +54,6 @@ class PdoMysqlCollector extends AbstractPdoCollector
                 time() + $this->timeInterval,
             ));
         } catch (\PDOException $e) {
-            echo $e->getMessage();
             // table yet not created
             $this->createTable();
             $this->collect();
