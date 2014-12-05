@@ -4,14 +4,12 @@ namespace Sokil\FraudDetector;
 
 class DetectorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCheck_RequestRate()
+    public function testCheck_RequestRate_FakeCollector()
     {
         $detector = new Detector();
 
         $status = new \stdClass();
         $status->ok = null;
-
-        $GLOBALS['globalVariable'] = 42;
 
         $detector
             ->setKey('someKey')
@@ -20,6 +18,44 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
                 $processor
                     ->setRequestRate(5, 1)
                     ->setCollector('fake');
+            })
+            ->onCheckPassed(function() use($status) {
+                $status->ok = true;
+            })
+            ->onCheckFailed(function() use($status) {
+                $status->ok = false;
+            });
+
+        for($i = 0; $i < 5; $i++) {
+            $detector->check();
+            $this->assertTrue($status->ok);
+        }
+
+        $detector->check();
+        $this->assertFalse($status->ok);
+    }
+
+    public function testCheck_RequestRate_MemcachedCollector()
+    {
+        $detector = new Detector();
+
+        $status = new \stdClass();
+        $status->ok = null;
+
+        $detector
+            ->setKey('someKey')
+            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+                /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
+                $processor
+                    ->setRequestRate(5, 1)
+                    ->setCollector('memcached', function($collector) {
+                        /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
+
+                        $memcached = new \Memcached();
+                        $memcached->addServer('127.0.0.1', 11211);
+
+                        $collector->setStorage($memcached);
+                    });
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
@@ -73,8 +109,6 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $status = new \stdClass();
         $status->ok = null;
-
-        $GLOBALS['globalVariable'] = 42;
 
         $detector
             ->setKey('someKey')
