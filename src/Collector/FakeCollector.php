@@ -10,13 +10,15 @@ class FakeCollector extends AbstractCollector
 
     public function isRateLimitExceed()
     {
+        $timeNow = microtime(true);
+
         // is key not exists
         if(!isset($this->keyList[$this->key])) {
             return false;
         }
 
         // is in time slot
-        if($this->keyList[$this->key]['expired'] < time()) {
+        if($this->keyList[$this->key]['expired'] < $timeNow) {
             return false;
         }
 
@@ -26,10 +28,12 @@ class FakeCollector extends AbstractCollector
 
     public function collect()
     {
-        if(isset($this->keyList[$this->key])) {
+        $timeNow = microtime(true);
+
+        if(isset($this->keyList[$this->key]) && $this->keyList[$this->key]['expired'] > $timeNow) {
             $this->keyList[$this->key]['requestNum']++;
         } else {
-            $this->keyList[$this->key] = array('expired' => time() + $this->timeInterval, 'requestNum' => 1);
+            $this->keyList[$this->key] = array('expired' => $timeNow + $this->timeInterval, 'requestNum' => 1);
         }
     }
 }

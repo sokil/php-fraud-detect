@@ -33,6 +33,11 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector->check();
         $this->assertFalse($status->ok);
+
+        usleep(11e5);
+
+        $detector->check();
+        $this->assertTrue($status->ok);
     }
 
     public function testCheck_RequestRate_MemcachedCollector()
