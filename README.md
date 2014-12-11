@@ -1,4 +1,4 @@
-php-fraud-detect
+php-fraud-detect (ALPHA)
 ================
 
 Checker of fraud requests 
