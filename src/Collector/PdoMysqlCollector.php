@@ -23,21 +23,26 @@ class PdoMysqlCollector extends AbstractPdoCollector
             FROM ' . $this->getTableName() . '
             WHERE
                 `key` = :key AND
-                `requestNum` <= :requestNum AND
-                `expired` > :expired';
+                `expired` > :timeNow AND
+                `requestNum` > :maxRequestNum';
 
         try {
-            $stmt = $this->storage->prepare($query);
+            $stmt = $this->storage->prepare($query, array(
+                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
+            ));
+
             $stmt->execute(array(
                 ':key' => $this->key,
-                ':requestNum' => $this->requestNum,
-                ':expired' => $timeNow,
+                ':maxRequestNum' => $this->requestNum,
+                ':timeNow' => $timeNow,
             ));
         } catch (\PDOException $e) {
+            // if exception occurs, than no table still created
             return false;
         }
 
-        if($stmt->fetchColumn()) {
+        // if record found than key has exceed requests
+        if(!$stmt->rowCount()) {
             return false;
         }
 
@@ -49,8 +54,8 @@ class PdoMysqlCollector extends AbstractPdoCollector
         $this->storage->query('
             CREATE TABLE ' . $this->getTableName() . '(
                 `key` varchar(255) PRIMARY KEY NOT NULL,
-                `requestNum` int,
-                `expired` timestamp
+                `requestNum` int NOT NULL DEFAULT 0,
+                `expired` datetime(3)
             ) ENGINE=Memory CHARSET=utf8;
         ');
     }
@@ -95,9 +100,16 @@ class PdoMysqlCollector extends AbstractPdoCollector
             $stmt = $this->storage->prepare($query);
             $stmt->execute(array(
                 ':key' => $this->key,
-                ':expired' => $timeNow + $this->timeInterval,
+                ':expired' => date('Y-m-d H:i:s', $timeNow + $this->timeInterval),
             ));
-        } elseif(time() < $row['expired']) {
+
+            return;
+
+        }
+
+        $expiredTimestamp = strtotime($row['expired']);
+
+        if($timeNow < $expiredTimestamp) {
             // in time slot - increment
             $query = '
                 UPDATE ' . $this->getTableName() . '
@@ -122,15 +134,17 @@ class PdoMysqlCollector extends AbstractPdoCollector
             $stmt = $this->storage->prepare($query);
             $stmt->execute(array(
                 ':key' => $this->key,
-                ':expired' => $timeNow + $this->timeInterval,
+                ':expired' => date('Y-m-d H:i:s', $timeNow + $this->timeInterval),
             ));
         }
 
+        echo $query;
+
         // garbage collector
-        if($timeNow % $this->garbageCollectorInterval === 0) {
+        if($timeNow % $this->garbageCollectorCheckInterval === 0) {
             $query = '
                 DELETE FROM ' . $this->getTableName() . '
-                WHERE expired < ' . $timeNow - $this->garbageCollectorSessionIntervale;
+                WHERE expired < ' . date('Y-m-d H:i:s', $timeNow - $this->garbageCollectorSessionIntervale);
         }
 
     }

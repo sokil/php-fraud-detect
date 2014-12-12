@@ -80,16 +80,19 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $status = new \stdClass();
         $status->ok = null;
 
+        // init pdo connection
+        $pdo = new \PDO('mysql:host=localhost;dbname=test', 'root', '');
+
+        // configure detector
         $detector
             ->setKey('someKey')
-            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) use($pdo) {
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
                 $processor
                     ->setRequestRate(5, 1)
-                    ->setCollector('pdo_mysql', function($collector) {
+                    ->setCollector('pdo_mysql', function($collector) use($pdo) {
                         /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
 
-                        $pdo = new \PDO('mysql:host=localhost;dbname=test', 'root', '');
                         $collector
                             ->setStorage($pdo)
                             ->setTableName('test_collector');
@@ -109,6 +112,9 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector->check();
         $this->assertFalse($status->ok);
+
+        // drop in-memory table
+        $pdo->query('DROP TABLE test_collector');
     }
 
     public function testCheck_Variable()
