@@ -35,7 +35,6 @@ abstract class AbstractProcessor
             $this->afterCheckPassed();
             return true;
         } else {
-            var_dump($this->getName() . '.checkFailed');
             $this->detector->trigger($this->getName() . '.checkFailed');
             $this->afterCheckFailed();
             return false;

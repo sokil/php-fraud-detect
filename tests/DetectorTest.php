@@ -90,7 +90,6 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
                         /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
 
                         $pdo = new \PDO('mysql:host=localhost;dbname=test', 'root', '');
-                        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                         $collector
                             ->setStorage($pdo)
                             ->setTableName('test_collector');
