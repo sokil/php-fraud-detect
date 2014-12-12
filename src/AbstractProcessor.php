@@ -19,12 +19,24 @@ abstract class AbstractProcessor
         $this->init();
     }
 
+    public function getName()
+    {
+        $fullyQualifiedClassNameChunks = explode('\\', get_called_class());
+        $className = array_pop($fullyQualifiedClassNameChunks);
+
+        // remove "Processor" suffix and lovercase first char
+        return lcfirst(substr($className, 0, -9));
+    }
+
     public function process()
     {
         if($this->isPassed()) {
+            $this->detector->trigger($this->getName() . '.checkPassed');
             $this->afterCheckPassed();
             return true;
         } else {
+            var_dump($this->getName() . '.checkFailed');
+            $this->detector->trigger($this->getName() . '.checkFailed');
             $this->afterCheckFailed();
             return false;
         }

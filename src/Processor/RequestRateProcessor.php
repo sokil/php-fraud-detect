@@ -25,13 +25,6 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
         return $this;
     }
 
-    protected function afterCheckFailed()
-    {
-        $this->detector->trigger('requestRate.rateExceed');
-
-        return $this;
-    }
-
     /**
      * Define time interval and maximum allowed request number on it
      * @param int $requestNumber maximum number of allowed requests
