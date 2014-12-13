@@ -1,6 +1,7 @@
 {
     "name": "sokil/php-fraud-detect",
     "description": "Detecting requrest flood",
+    "license": "MIT",
     "authors": [
         {
             "name": "Dmytro Sokil",
