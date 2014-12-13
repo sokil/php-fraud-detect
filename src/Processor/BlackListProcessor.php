@@ -17,7 +17,7 @@ class BlackListProcessor extends \Sokil\FraudDetector\AbstractProcessor
         $self = $this;
 
         // rate exceed event handler
-        $this->detector->subscribe('requestRate.rateExceed', function() use($self) {
+        $this->detector->subscribe('requestRate.checkFailed', function() use($self) {
             // ban on rate exceed
             if($self->isBannedOnRateExceed()) {
                 $self->ban();
