@@ -103,6 +103,14 @@ class Detector
         return $this;
     }
 
+    public function addProcssor($name, AbstractProcessor $processor, $priority = 0)
+    {
+        $this->declareProcessor($name, null, $priority);
+        $this->processorList[$name] = $processor;
+
+        return $this;
+    }
+
     public function isProcessorDeclared($name)
     {
         return $this->processorDeclarationList->has($name);
