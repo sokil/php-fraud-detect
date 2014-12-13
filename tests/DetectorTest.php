@@ -76,6 +76,11 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector->check();
         $this->assertFalse($status->ok);
+
+        usleep(2e6);
+
+        $detector->check();
+        $this->assertTrue($status->ok);
     }
 
     public function testCheck_RequestRate_PdoMysqlCollector()
@@ -87,6 +92,10 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         // init pdo connection
         $pdo = new \PDO('mysql:host=localhost;dbname=test', 'root', '');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        // drop in-memory table
+        $pdo->query('DROP TABLE IF EXISTS test_collector');
 
         // configure detector
         $detector
@@ -118,8 +127,13 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $detector->check();
         $this->assertFalse($status->ok);
 
+        usleep(11e5);
+
+        $detector->check();
+        $this->assertTrue($status->ok);
+
         // drop in-memory table
-        $pdo->query('DROP TABLE test_collector');
+        $pdo->query('DROP TABLE IF EXISTS test_collector');
     }
 
     public function testCheck_Variable()

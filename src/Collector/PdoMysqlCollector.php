@@ -10,32 +10,35 @@ class PdoMysqlCollector extends AbstractPdoCollector
 
     public function setGarbageCollector($checkInterval, $sessionInterval)
     {
-        $this->garbageCollectorCheckInterval = (int) $checknterval;
+        $this->garbageCollectorCheckInterval = (int) $checkInterval;
         $this->garbageCollectorSessionInterval = (int) $sessionInterval;
         return $this;
     }
 
     public function isRateLimitExceed()
     {
-        $timeNow = time();
+        $timeNow = microtime(true);
 
         $query = 'SELECT 1
             FROM ' . $this->getTableName() . '
             WHERE
                 `key` = :key AND
-                `expired` > :timeNow AND
-                `requestNum` > :maxRequestNum';
+                `expired` >= :timeNow AND
+                `requestNum` >= :maxRequestNum';
+
+        $parameters = array(
+            ':key' => $this->key,
+            ':maxRequestNum' => $this->requestNum,
+            ':timeNow' => $timeNow,
+        );
 
         try {
             $stmt = $this->storage->prepare($query, array(
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
             ));
 
-            $stmt->execute(array(
-                ':key' => $this->key,
-                ':maxRequestNum' => $this->requestNum,
-                ':timeNow' => $timeNow,
-            ));
+            $stmt->execute($parameters);
+
         } catch (\PDOException $e) {
             // if exception occurs, than no table still created
             return false;
@@ -55,14 +58,15 @@ class PdoMysqlCollector extends AbstractPdoCollector
             CREATE TABLE ' . $this->getTableName() . '(
                 `key` varchar(255) PRIMARY KEY NOT NULL,
                 `requestNum` int NOT NULL DEFAULT 0,
-                `expired` datetime(3)
+                `expired` numeric(13, 3)
             ) ENGINE=Memory CHARSET=utf8;
         ');
+
     }
 
     public function collect()
     {
-        $timeNow = time();
+        $timeNow = microtime(true);
 
         // check if record already exists and get current values
         try {
@@ -98,29 +102,26 @@ class PdoMysqlCollector extends AbstractPdoCollector
             ';
 
             $stmt = $this->storage->prepare($query);
-            $stmt->execute(array(
-                ':key' => $this->key,
-                ':expired' => date('Y-m-d H:i:s', $timeNow + $this->timeInterval),
-            ));
+            $stmt->bindValue(':key', $this->key);
+            $stmt->bindValue(':expired', $timeNow + $this->timeInterval);
+            $stmt->execute();
 
             return;
 
         }
 
-        $expiredTimestamp = strtotime($row['expired']);
+        $expiredTimestamp = (float) $row['expired'];
 
-        if($timeNow < $expiredTimestamp) {
+        if($timeNow <= $expiredTimestamp) {
             // in time slot - increment
             $query = '
                 UPDATE ' . $this->getTableName() . '
                 SET requestNum = requestNum + 1
-                WHERE key = :key
+                WHERE `key` = :key
             ';
-
-            $stmt = $this->storage->prepare($query);
-            $stmt->execute(array(
+            $parameters = array(
                 ':key' => $this->key,
-            ));
+            );
         } else {
             //outside time slot - set new
             $query = '
@@ -128,17 +129,17 @@ class PdoMysqlCollector extends AbstractPdoCollector
                 SET
                     requestNum = 1,
                     expired = :expired
-                WHERE key = :key
+                WHERE `key` = :key
             ';
-
-            $stmt = $this->storage->prepare($query);
-            $stmt->execute(array(
+            $parameters = array(
                 ':key' => $this->key,
-                ':expired' => date('Y-m-d H:i:s', $timeNow + $this->timeInterval),
-            ));
+                ':expired' => $timeNow + $this->timeInterval,
+            );
         }
 
-        echo $query;
+        $stmt = $this->storage->prepare($query);
+        $stmt->execute($parameters);
+
 
         // garbage collector
         if($timeNow % $this->garbageCollectorCheckInterval === 0) {
