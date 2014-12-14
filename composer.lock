@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a6cd0aeba932d32df6e376369cdc9d36",
+    "hash": "9ee57735e55dd79c6632c8f20c39abe3",
     "packages": [
         {
             "name": "sokil/php-list",
@@ -926,6 +926,8 @@
         "satooshi/php-coveralls": 20
     },
     "prefer-stable": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.3"
+    },
     "platform-dev": []
 }

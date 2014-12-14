@@ -33,12 +33,11 @@ class PdoMysqlCollector extends AbstractPdoCollector
         );
 
         try {
-            $stmt = $this->storage->prepare($query, array(
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
-            ));
-
-            $stmt->execute($parameters);
-
+            $stmt = $this->storage->prepare($query);
+            $result = @$stmt->execute($parameters);
+            if(!$result) {
+                throw new \PDOException('Table not exists');
+            }
         } catch (\PDOException $e) {
             // if exception occurs, than no table still created
             return false;
@@ -76,15 +75,15 @@ class PdoMysqlCollector extends AbstractPdoCollector
                 WHERE `key` = :key
                 FOR UPDATE';
 
-            $stmt = $this->storage->prepare($query, array(
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
-            ));
-
-            $stmt->execute(array(
+            $stmt = $this->storage->prepare($query);
+            $result = @$stmt->execute(array(
                 ':key' => $this->key,
             ));
 
-            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if(!$result) {
+                throw new \PDOException('Table not exists');
+            }
+
 
         } catch (\PDOException $e) {
             // table yet not created
@@ -92,6 +91,8 @@ class PdoMysqlCollector extends AbstractPdoCollector
             $this->collect();
             return;
         }
+
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         if(!$row) {
             // record not exists
@@ -145,7 +146,7 @@ class PdoMysqlCollector extends AbstractPdoCollector
         if($timeNow % $this->garbageCollectorCheckInterval === 0) {
             $query = '
                 DELETE FROM ' . $this->getTableName() . '
-                WHERE expired < ' . date('Y-m-d H:i:s', $timeNow - $this->garbageCollectorSessionIntervale);
+                WHERE expired < ' . ($timeNow - $this->garbageCollectorSessionIntervale);
         }
 
     }

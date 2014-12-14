@@ -83,7 +83,20 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($status->ok);
     }
 
-    public function testCheck_RequestRate_PdoMysqlCollector()
+
+    public function getPDOErrorModeList()
+    {
+        return array(
+            array(\PDO::ERRMODE_SILENT),
+            array(\PDO::ERRMODE_WARNING),
+            array(\PDO::ERRMODE_EXCEPTION),
+        );
+    }
+
+    /**
+     * @dataProvider getPDOErrorModeList
+     */
+    public function testCheck_RequestRate_PdoMysqlCollector($pdoErrorMode)
     {
         $detector = new Detector();
 
@@ -92,7 +105,7 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         // init pdo connection
         $pdo = new \PDO('mysql:host=localhost;dbname=test', 'root', '');
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, $pdoErrorMode);
 
         // drop in-memory table
         $pdo->query('DROP TABLE IF EXISTS test_collector');
