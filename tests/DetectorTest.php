@@ -300,4 +300,35 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($detector->isProcessorDeclared('SOME_UNEXISTED_PROCESSOR'));
     }
+
+    public function testEvents()
+    {
+        $detector = new Detector;
+
+        $status = new \stdclass;
+        $status->value = '';
+
+        $detector->subscribe('event1', function($e) use($status) {
+            $status->value .= '[1.10]' . $e->getTarget();
+        }, 10);
+
+        $detector->subscribe('event1', function($e) use($status) {
+            $status->value .= '[1.20]' . $e->getTarget();
+        }, 20);
+
+        $detector->subscribe('event2', function($e) use($status) {
+            $status->value .= '[2.10]' . $e->getTarget();
+
+            $e->cancel();
+        }, 10);
+
+        $event1 = $detector->trigger('event1', 'target1');
+        $this->assertInstanceOf('\Sokil\FraudDetector\Event', $event1);
+        $this->assertFalse($event1->isCancelled());
+
+        $event2 = $detector->trigger('event2', 'target2');
+        $this->assertTrue($event2->isCancelled());
+
+        $this->assertEquals('[1.20]target1[1.10]target1[2.10]target2', $status->value);
+    }
 }

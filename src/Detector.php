@@ -240,6 +240,12 @@ class Detector
         return $this;
     }
 
+    /**
+     *
+     * @param string $eventName
+     * @param mixed $target
+     * @return \Sokil\FraudDetector\Event
+     */
     public function trigger($eventName, $target = null)
     {
         $event = new Event();
@@ -248,7 +254,6 @@ class Detector
             $event->setTarget($target);
         }
 
-        $this->eventDispatcher->dispatch($eventName, $event);
-        return $this;
+        return $this->eventDispatcher->dispatch($eventName, $event);
     }
 }
