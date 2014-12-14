@@ -122,7 +122,8 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
                         $collector
                             ->setStorage($pdo)
-                            ->setTableName('test_collector');
+                            ->setTableName('test_collector')
+                            ->setGarbageCollector(1,1);
                     });
             })
             ->onCheckPassed(function() use($status) {

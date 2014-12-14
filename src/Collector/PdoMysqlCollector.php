@@ -4,14 +4,14 @@ namespace Sokil\FraudDetector\Collector;
 
 class PdoMysqlCollector extends AbstractPdoCollector
 {
-    private $garbageCollectorCheckInterval = 1200;
+    private $gcCheckInterval = 1200;
 
-    private $garbageCollectorSessionInterval = 1200;
+    private $gcSessionInterval = 1200;
 
     public function setGarbageCollector($checkInterval, $sessionInterval)
     {
-        $this->garbageCollectorCheckInterval = (int) $checkInterval;
-        $this->garbageCollectorSessionInterval = (int) $sessionInterval;
+        $this->gcCheckInterval = (int) $checkInterval;
+        $this->gcSessionInterval = (int) $sessionInterval;
         return $this;
     }
 
@@ -143,10 +143,10 @@ class PdoMysqlCollector extends AbstractPdoCollector
 
 
         // garbage collector
-        if($timeNow % $this->garbageCollectorCheckInterval === 0) {
+        if($timeNow % $this->gcCheckInterval === 0) {
             $query = '
                 DELETE FROM ' . $this->getTableName() . '
-                WHERE expired < ' . ($timeNow - $this->garbageCollectorSessionIntervale);
+                WHERE expired < ' . ($timeNow - $this->gcSessionInterval);
         }
 
     }
