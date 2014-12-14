@@ -57,29 +57,10 @@ class VariableProcessor extends \Sokil\FraudDetector\AbstractProcessor
         }
     }
 
-    protected function isValueExists()
-    {
-        switch($this->variableType) {
-            case 'GLOBALS'  : return array_key_exists($this->name, $GLOBALS);
-            case '_GET'     : return array_key_exists($this->name, $_GET);
-            case '_POST'    : return array_key_exists($this->name, $_POST);
-            case '_SERVER'  : return array_key_exists($this->name, $_SERVER);
-            case '_REQUEST' : return array_key_exists($this->name, $_REQUEST);
-            case '_SESSION' : return array_key_exists($this->name, $_SESSION);
-            case '_COOKIE'  : return array_key_exists($this->name, $_COOKIE);
-            case '_FILES'   : return array_key_exists($this->name, $_FILES);
-            case '_ENV'     : return array_key_exists($this->name, $_ENV);
-        }
-    }
-
     public function isPassed()
     {
         foreach($this->conditionList as $condition => $conditionValue) {
             switch($condition) {
-
-                case self::CONDITION_EXISTS:
-                    $passed = $this->isValueExists();
-                    break;
 
                 case self::CONDITION_EQUALS:
                     $passed = ($this->getValue() === $conditionValue);
@@ -112,7 +93,6 @@ class VariableProcessor extends \Sokil\FraudDetector\AbstractProcessor
 
         return true;
     }
-
 
     public function equals($value)
     {

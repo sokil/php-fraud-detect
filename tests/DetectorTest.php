@@ -150,7 +150,25 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         $pdo->query('DROP TABLE IF EXISTS test_collector');
     }
 
-    public function testCheck_Variable()
+    public function getVarTypeList()
+    {
+        return array(
+            array('GLOBALS'),
+            array('_GET'),
+            array('_POST'),
+            array('_SERVER'),
+            array('_REQUEST'),
+            array('_SESSION'),
+            array('_COOKIE'),
+            array('_FILES'),
+            array('_ENV'),
+        );
+    }
+
+    /**
+     * @dataProvider getVarTypeList
+     */
+    public function testCheck_Variable($varType)
     {
         $detector = new Detector();
 
@@ -160,9 +178,14 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector
             ->setKey('someKey')
-            ->declareProcessor('variable', function(\Sokil\FraudDetector\Processor\VariableProcessor $processor) {
+            ->declareProcessor('variable', function($processor) use($varType) {
                 /* @var $processor \Sokil\FraudDetector\Processor\VariableProcessor */
-                $processor->setName('globalVariable')->equals(42);
+                $processor
+                    ->setName('globalVariable', $varType)
+                    ->equals(42)
+                    ->notEquals(500)
+                    ->greater(41)
+                    ->lower(43);
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
@@ -171,11 +194,13 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
                 $status->ok = false;
             });
 
-        $GLOBALS['globalVariable'] = 42;
+        // valid var
+        $GLOBALS[$varType]['globalVariable'] = 42;
         $detector->check();
         $this->assertTrue($status->ok);
 
-        $GLOBALS['globalVariable'] = 43;
+        // invalid var
+        $GLOBALS[$varType]['globalVariable'] = 43;
         $detector->check();
         $this->assertFalse($status->ok);
     }
