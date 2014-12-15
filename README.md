@@ -1,4 +1,4 @@
-php-fraud-detect (ALPHA)
+php-fraud-detect
 ================
 
 Checker of fraud requests. This component allows you to check if some user do no more requests than allowed, and if limits of requests reched do some tasks like ban user or show captcha.
