@@ -26,11 +26,17 @@ You can install library through Composer:
 
 $detector = new \Sokil\FraudDetector\Detector();
 $detector
-    ->setKey('someKey')
+    // Configure unique user identifier like session id or track id or user ip
+    ->setKey(session_id())
+    // You can add few processors which execute different checks.
+    // This processor may check request from proxy, existance of user in blacklist, etc.
+    // This processor check if number of requests reached.
     ->declareProcessor('requestRate', function($processor) {
         /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
         $processor
+            // Limit set as 5 requests for one second.
             ->setRequestRate(5, 1)
+            // Collector used to store stat of requests
             ->setCollector('memcached', function($collector) {
                 /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
                 $memcached = new \Memcached();
