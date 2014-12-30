@@ -29,7 +29,7 @@ $detector
     // Configure unique user identifier like session id or track id or user ip
     ->setKey(session_id())
     // You can add few processors which execute different checks.
-    // This processor may check request from proxy, existance of user in blacklist, etc.
+    // Processors may check request from proxy, existance of user in blacklist, etc.
     // This processor check if number of requests reached.
     ->declareProcessor('requestRate', function($processor) {
         /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
