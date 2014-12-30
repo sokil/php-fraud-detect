@@ -23,10 +23,11 @@ You can install library through Composer:
 
 ```php
 <?php
-$detector = new Detector();
+
+$detector = new \Sokil\FraudDetector\Detector();
 $detector
     ->setKey('someKey')
-    ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+    ->declareProcessor('requestRate', function($processor) {
         /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
         $processor
             ->setRequestRate(5, 1)
