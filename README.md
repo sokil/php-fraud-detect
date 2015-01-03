@@ -6,6 +6,7 @@ Checker of fraud requests. This component allows you to check if some user do no
 [![Build Status](https://travis-ci.org/sokil/php-fraud-detect.png?branch=master&1)](https://travis-ci.org/sokil/php-fraud-detect)
 [![Latest Stable Version](https://poser.pugx.org/sokil/php-fraud-detect/v/stable.png)](https://packagist.org/packages/sokil/php-fraud-detect)
 [![Coverage Status](https://coveralls.io/repos/sokil/php-fraud-detect/badge.png)](https://coveralls.io/r/sokil/php-fraud-detect)
+[![Total Downloads](http://img.shields.io/packagist/dt/sokil/php-fraud-detect.svg)](https://packagist.org/packages/sokil/php-fraud-detect)
 
 Installation
 ------------
