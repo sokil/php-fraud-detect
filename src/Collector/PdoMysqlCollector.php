@@ -2,6 +2,10 @@
 
 namespace Sokil\FraudDetector\Collector;
 
+/**
+ * Using memory table of MySQL storate as collector
+ * Amount of space on memory table limited by `max_heap_table_size`, so set prefered value.
+ */
 class PdoMysqlCollector extends AbstractPdoCollector
 {
     private $gcCheckInterval = 1200;
