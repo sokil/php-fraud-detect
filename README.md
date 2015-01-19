@@ -8,6 +8,7 @@ Checker of fraud requests. This component allows you to check if some user do no
 [![Coverage Status](https://coveralls.io/repos/sokil/php-fraud-detect/badge.png)](https://coveralls.io/r/sokil/php-fraud-detect)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/sokil/php-fraud-detect?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Total Downloads](http://img.shields.io/packagist/dt/sokil/php-fraud-detect.svg)](https://packagist.org/packages/sokil/php-fraud-detect)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sokil/php-fraud-detect/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/sokil/php-fraud-detect/?branch=master)
 
 Installation
 ------------
