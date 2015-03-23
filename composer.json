@@ -11,7 +11,7 @@
     "require": {
         "php": ">=5.3",
         "sokil/php-list": "0.*",
-        "symfony/event-dispatcher": "2.5.*"
+        "symfony/event-dispatcher": "2.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
