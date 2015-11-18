@@ -58,3 +58,18 @@ $detector
     })
     ->check();
 ```
+
+### Custom processors
+
+You can write your own processor. It must extend `\Sokil\FraudDetector\AbstractProcessor` class. Just register your processor's namespace and configure it:
+
+```php
+<?php
+
+$detector = new \Sokil\FraudDetector\Detector();
+$detector
+    ->registerProcessorNamespace('\Acme\FraudDetecotr\Processor')
+    ->declareProcessor('customProcessor', function($processor) {});
+```
+
+All processorts seeking among registered namespaces according to priority of their registration.
