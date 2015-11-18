@@ -68,7 +68,7 @@ You can write your own processor. It must extend `\Sokil\FraudDetector\AbstractP
 
 $detector = new \Sokil\FraudDetector\Detector();
 $detector
-    ->registerProcessorNamespace('\Acme\FraudDetecotr\Processor')
+    ->registerProcessorNamespace('\Acme\FraudDetecotor\Processor')
     ->declareProcessor('customProcessor', function($processor) {});
 ```
 
