@@ -24,6 +24,8 @@ You can install library through Composer:
 
 ### Basic usage
 
+If there are not enought functionality of your frontend server, like [Nginx request limits](http://nginx.org/ru/docs/http/ngx_http_limit_req_module.html), and you want to customize detection of fraud requests, this library is for you.
+
 ```php
 <?php
 
