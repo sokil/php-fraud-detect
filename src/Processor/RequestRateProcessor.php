@@ -44,10 +44,6 @@ class RequestRateProcessor extends AbstractProcessor
     {
         $className = $this->detector->getCollectorClassName($type);
 
-        if(!class_exists($className)) {
-            throw new \Exception('Collector ' . $className . ' not found');
-        }
-
         $this->collector = new $className(
             $this->detector->getKey() . ':' . $this->getName(),
             $this->requestNumber,
