@@ -3,6 +3,7 @@
 namespace Sokil\FraudDetector\Processor;
 
 use \Sokil\FraudDetector\AbstractProcessor;
+use Sokil\FraudDetector\Processor\RequestRate\Collector\CollectorInterface;
 
 class RequestRateProcessor extends AbstractProcessor
 {
@@ -49,6 +50,10 @@ class RequestRateProcessor extends AbstractProcessor
             $this->requestNumber,
             $this->timeInterval
         );
+
+        if (!($this->collector instanceof CollectorInterface)) {
+            throw new \Exception('Collector must inherit CollectorInterface');
+        }
 
         // configure
         if(is_callable($configuratorCallable)) {

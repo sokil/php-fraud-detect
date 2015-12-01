@@ -156,6 +156,10 @@ class Detector
         $processorClassName = $this->getProcessorClassName($processorName);
         $processor =  new $processorClassName($this);
 
+        if (!($processor instanceof ProcessorInterface)) {
+            throw new \Exception('Processor must inherit ProcessorInterface');
+        }
+
         // configure processor
         $configuratorCallable = $this->processorDeclarationList->get($processorName);
         if($configuratorCallable && is_callable($configuratorCallable)) {
