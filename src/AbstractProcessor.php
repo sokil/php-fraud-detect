@@ -2,7 +2,7 @@
 
 namespace Sokil\FraudDetector;
 
-abstract class AbstractProcessor
+abstract class AbstractProcessor implements ProcessorInterface
 {
     /**
      *
@@ -40,8 +40,6 @@ abstract class AbstractProcessor
             return false;
         }
     }
-
-    abstract protected function isPassed();
 
     protected function afterCheckPassed() {}
 

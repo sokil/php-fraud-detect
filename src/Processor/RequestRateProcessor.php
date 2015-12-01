@@ -10,7 +10,7 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
 
     /**
      *
-     * @var \Sokil\FraudDetector\Processor\RequestRate\AbstractCollector
+     * @var \Sokil\FraudDetector\CollectorInterface
      */
     private $collector;
 

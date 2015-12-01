@@ -2,7 +2,7 @@
 
 namespace Sokil\FraudDetector;
 
-abstract class AbstractCollector
+abstract class AbstractCollector implements CollectorInterface
 {
     protected $storage;
 
@@ -30,8 +30,4 @@ abstract class AbstractCollector
         $this->storage = $storage;
         return $this;
     }
-
-    abstract public function collect();
-
-    abstract public function isRateLimitExceed();
 }
