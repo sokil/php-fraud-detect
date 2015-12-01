@@ -19,7 +19,7 @@ class BlackListProcessor extends AbstractProcessor
         $self = $this;
 
         // rate exceed event handler
-        $this->detector->subscribe('requestRate.checkFailed', function() use($self) {
+        $this->detector->subscribe('checkFailed:requestRate', function() use($self) {
             // ban on rate exceed
             if($self->isBannedOnRateExceed()) {
                 $self->ban();

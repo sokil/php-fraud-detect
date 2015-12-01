@@ -13,8 +13,6 @@ class Detector
 
     private $state = self::STATE_UNCHECKED;
 
-    private $handlers = array();
-
     /**
      *
      * @var mixed key to identify unique user
@@ -74,18 +72,20 @@ class Detector
         /* @var $processor \Sokil\FraudDetector\ProcessorInterface */
         foreach($this->processorDeclarationList->getKeys() as $processorName) {
             $processor = $this->getProcessor($processorName);
+
             if($processor->isPassed()) {
                 $processor->afterCheckPassed();
-                $this->trigger($processorName . '.checkPassed');
-                $this->setState(self::STATE_PASSED);
+                $this->trigger(self::STATE_PASSED . ':' . $processorName);
+                $this->state = self::STATE_PASSED;
             } else {
                 $processor->afterCheckFailed();
-                $this->trigger($processorName . '.checkFailed');
-                $this->setState(self::STATE_FAILED);
+                $this->trigger(self::STATE_FAILED . ':' . $processorName);
+                $this->state = self::STATE_FAILED;
+                break;
             }
         }
 
-        $this->callDelayedHandlers();
+        $this->trigger($this->state);
     }
 
     public function registerProcessorNamespace($namespace)
@@ -163,6 +163,17 @@ class Detector
         return $processor;
     }
 
+    private function on($stateName, $callable)
+    {
+        if($this->hasState(self::STATE_UNCHECKED)) {
+            $this->subscribe($stateName, $callable);
+        } elseif($this->hasState($stateName)) {
+            call_user_func($callable);
+        }
+
+        return $this;
+    }
+
     public function onCheckPassed($callable)
     {
         $this->on(self::STATE_PASSED, $callable);
@@ -195,48 +206,6 @@ class Detector
     private function hasState($state)
     {
         return $this->state === $state;
-    }
-
-    private function setState($state)
-    {
-        $this->state = $state;
-        return $this;
-    }
-
-    private function on($stateName, $callable)
-    {
-        if($this->hasState(self::STATE_UNCHECKED)) {
-            $this->delayHandler($stateName, $callable);
-        } elseif($this->hasState($stateName)) {
-            $this->callHandler($callable);
-        }
-
-        return $this;
-    }
-
-    private function callHandler($callable)
-    {
-        call_user_func($callable);
-        return $this;
-    }
-
-    private function delayHandler($stateName, $callable)
-    {
-        $this->handlers[$stateName][] = $callable;
-        return $this;
-    }
-
-    private function callDelayedHandlers()
-    {
-        if(empty($this->handlers[$this->state])) {
-            return $this;
-        }
-
-        foreach($this->handlers[$this->state] as $callable) {
-            $this->callHandler($callable);
-        }
-
-        return $this;
     }
 
     public function subscribe($eventName, $callable, $priority = 0)
