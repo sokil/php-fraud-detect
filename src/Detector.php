@@ -71,7 +71,7 @@ class Detector
     public function check()
     {
         // check all conditions
-        /* @var $processor \Sokil\FraudDetector\AbstractProcessor */
+        /* @var $processor \Sokil\FraudDetector\ProcessorInterface */
         foreach($this->processorDeclarationList->getKeys() as $processorName) {
             if($this->getProcessor($processorName)->process()) {
                 $this->setState(self::STATE_PASSED);
@@ -120,7 +120,7 @@ class Detector
      * Factory method to create new check condition
      *
      * @param string $name name of check condition
-     * @return \Sokil\FraudDetector\AbstractProcessor
+     * @return \Sokil\FraudDetector\ProcessorInterface
      * @throws \Exception
      */
     private function getProcessorClassName($name)

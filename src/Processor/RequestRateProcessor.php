@@ -2,7 +2,9 @@
 
 namespace Sokil\FraudDetector\Processor;
 
-class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
+use \Sokil\FraudDetector\AbstractProcessor;
+
+class RequestRateProcessor extends AbstractProcessor
 {
     private $requestNumber = 1;
 
@@ -14,7 +16,7 @@ class RequestRateProcessor extends \Sokil\FraudDetector\AbstractProcessor
      */
     private $collector;
 
-    protected function isPassed()
+    public function isPassed()
     {
         return !$this->collector->isRateLimitExceed();
     }

@@ -2,7 +2,9 @@
 
 namespace Sokil\FraudDetector\Processor;
 
-class BlackListProcessor extends \Sokil\FraudDetector\AbstractProcessor
+use \Sokil\FraudDetector\AbstractProcessor;
+
+class BlackListProcessor extends AbstractProcessor
 {
     /**
      *
@@ -25,7 +27,7 @@ class BlackListProcessor extends \Sokil\FraudDetector\AbstractProcessor
         });
     }
 
-    protected function isPassed()
+    public function isPassed()
     {
         return !$this->isBanned();
     }

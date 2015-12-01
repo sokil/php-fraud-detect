@@ -10,9 +10,5 @@ interface ProcessorInterface
 
     public function process();
 
-    protected function isPassed();
-
-    protected function afterCheckPassed() {}
-
-    protected function afterCheckFailed() {}
+    public function isPassed();
 }

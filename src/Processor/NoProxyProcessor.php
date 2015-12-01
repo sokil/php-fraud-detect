@@ -2,7 +2,9 @@
 
 namespace Sokil\FraudDetector\Processor;
 
-class NoProxyProcessor extends \Sokil\FraudDetector\AbstractProcessor
+use \Sokil\FraudDetector\AbstractProcessor;
+
+class NoProxyProcessor extends AbstractProcessor
 {
     private $proxyHeaders = array(
         'CLIENT_IP',
