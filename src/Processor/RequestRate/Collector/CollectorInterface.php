@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\FraudDetector;
+namespace Sokil\FraudDetector\Processor\RequestRate\Collector;
 
 interface CollectorInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\FraudDetector\Collector;
+namespace Sokil\FraudDetector\Processor\RequestRate\Collector;
 
 /**
  * Using memory table of MySQL storate as collector

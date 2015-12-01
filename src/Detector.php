@@ -31,6 +31,10 @@ class Detector
         '\Sokil\FraudDetector\Processor',
     );
 
+    private $collectorNamespaces = array(
+        '\Sokil\FraudDetector\Processor\RequestRate\Collector',
+    );
+
     /**
      *
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -161,6 +165,32 @@ class Detector
         $this->processorList[$processorName] = $processor;
 
         return $processor;
+    }
+
+    public function registerCollectorNamespace($namespace)
+    {
+        $this->collectorNamespaces[] = rtrim($namespace, '\\');
+        return $this;
+    }
+
+    public function getCollectorClassName($type)
+    {
+        if(false == strpos($type, '_')) {
+            $className = ucfirst($type);
+        } else {
+            $className = implode('', array_map('ucfirst', explode('_', $type)));
+        }
+
+        $className .= 'Collector';
+
+        foreach($this->collectorNamespaces as $namespace) {
+            $fullyQualifiedClassName = $namespace . '\\' . $className;
+            if(class_exists($fullyQualifiedClassName)) {
+                return $fullyQualifiedClassName;
+            }
+        }
+
+        throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
     }
 
     private function on($stateName, $callable)

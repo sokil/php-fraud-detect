@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\FraudDetector\Processor\BlackList;
+namespace Sokil\FraudDetector\Processor\BlackList\Storage;
 
 abstract class AbstractStorage
 {

@@ -1,8 +1,6 @@
 <?php
 
-namespace Sokil\FraudDetector\Collector;
-
-use \Sokil\FraudDetector\AbstractCollector;
+namespace Sokil\FraudDetector\Processor\RequestRate\Collector;
 
 /**
  * @property \PDO $storage Instance of \PDO storage
