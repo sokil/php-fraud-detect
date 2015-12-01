@@ -8,7 +8,9 @@ interface ProcessorInterface
 
     public function getName();
 
-    public function process();
+    public function afterCheckPassed();
+
+    public function afterCheckFailed();
 
     public function isPassed();
 }

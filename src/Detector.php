@@ -73,9 +73,14 @@ class Detector
         // check all conditions
         /* @var $processor \Sokil\FraudDetector\ProcessorInterface */
         foreach($this->processorDeclarationList->getKeys() as $processorName) {
-            if($this->getProcessor($processorName)->process()) {
+            $processor = $this->getProcessor($processorName);
+            if($processor->isPassed()) {
+                $processor->afterCheckPassed();
+                $this->trigger($processorName . '.checkPassed');
                 $this->setState(self::STATE_PASSED);
             } else {
+                $processor->afterCheckFailed();
+                $this->trigger($processorName . '.checkFailed');
                 $this->setState(self::STATE_FAILED);
             }
         }

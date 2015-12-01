@@ -28,20 +28,7 @@ abstract class AbstractProcessor implements ProcessorInterface
         return lcfirst(substr($className, 0, -9));
     }
 
-    public function process()
-    {
-        if($this->isPassed()) {
-            $this->detector->trigger($this->getName() . '.checkPassed');
-            $this->afterCheckPassed();
-            return true;
-        } else {
-            $this->detector->trigger($this->getName() . '.checkFailed');
-            $this->afterCheckFailed();
-            return false;
-        }
-    }
+    public function afterCheckPassed() {}
 
-    protected function afterCheckPassed() {}
-
-    protected function afterCheckFailed() {}
+    public function afterCheckFailed() {}
 }

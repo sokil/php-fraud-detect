@@ -21,7 +21,7 @@ class RequestRateProcessor extends AbstractProcessor
         return !$this->collector->isRateLimitExceed();
     }
 
-    protected function afterCheckPassed()
+    public function afterCheckPassed()
     {
         $this->collector->collect();
         return $this;
