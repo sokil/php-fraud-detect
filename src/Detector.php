@@ -270,6 +270,12 @@ class Detector
 
     }
 
+    public function registerStorageNamespace($namespace)
+    {
+        $this->storageNamespaces[] = rtrim($namespace, '\\');
+        return $this;
+    }
+
     private function on($stateName, $callable)
     {
         if($this->hasState(self::STATE_UNCHECKED)) {
