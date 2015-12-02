@@ -2,11 +2,12 @@
 
 namespace Sokil\FraudDetector\Processor;
 
+use Sokil\FraudDetector\Storage\StorageInterface;
+
 class BlackListProcessor extends AbstractProcessor
 {
     /**
-     *
-     * @var \Sokil\FraudDetector\Processor\BlackList\Storage\AbstractStorage
+     * @var \Sokil\FraudDetector\Storage\StorageInterface
      */
     private $storage;
 
@@ -52,22 +53,9 @@ class BlackListProcessor extends AbstractProcessor
         return true === $this->banOnRateExceed;
     }
 
-    public function setStorage($type, $configuratorCallable = null)
+    public function setStorage(StorageInterface $storage)
     {
-        $className = '\Sokil\FraudDetector\Processor\BlackList\Storage\\' . ucfirst($type) . 'Storage';
-
-        if(!class_exists($className)) {
-            throw new \Exception('Storage ' . $type . ' not found');
-        }
-
-        $this->storage = new $className();
-
-        // configure
-        if(is_callable($configuratorCallable)) {
-            call_user_func($configuratorCallable, $this->storage);
-        }
-
+        $this->storage = $storage;
         return $this;
-
     }
 }

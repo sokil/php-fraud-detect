@@ -37,6 +37,10 @@ class Detector
         '\Sokil\FraudDetector\Collector',
     );
 
+    private $storageNamespaces = array(
+        '\Sokil\FraudDetector\Storage',
+    );
+
     /**
      *
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -228,6 +232,41 @@ class Detector
         }
 
         return $collector;
+
+    }
+
+    private function getStorageClassName($type)
+    {
+        if(false == strpos($type, '_')) {
+            $className = ucfirst($type);
+        } else {
+            $className = implode('', array_map('ucfirst', explode('_', $type)));
+        }
+
+        $className .= 'Storage';
+
+        foreach($this->storageNamespaces as $namespace) {
+            $fullyQualifiedClassName = $namespace . '\\' . $className;
+            if(class_exists($fullyQualifiedClassName)) {
+                return $fullyQualifiedClassName;
+            }
+        }
+
+        throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
+    }
+
+    public function createStorage($type, $configuratorCallable = null)
+    {
+        $className = $this->getStorageClassName($type);
+
+        $storage = new $className();
+
+        // configure
+        if(is_callable($configuratorCallable)) {
+            call_user_func($configuratorCallable, $storage);
+        }
+
+        return $storage;
 
     }
 

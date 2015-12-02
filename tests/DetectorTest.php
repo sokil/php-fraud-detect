@@ -249,10 +249,10 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
                 $processor->setCollector($detector->createCollector('fake', 'requestRate', 5, 1));
             })
-            ->declareProcessor('blackList', function($processor) {
+            ->declareProcessor('blackList', function($processor, $detector) {
                 /* @var $processor \Sokil\FraudDetector\Processor\BlackListProcessor */
                 $processor
-                    ->setStorage('fake')
+                    ->setStorage($detector->createStorage('fake'))
                     ->banOnRateExceed();
             })
             ->onCheckPassed(function() use($status) {
@@ -282,9 +282,9 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector
             ->setKey('someKey')
-            ->declareProcessor('blackList', function($processor) {
+            ->declareProcessor('blackList', function($processor, $detector) {
                 /* @var $processor \Sokil\FraudDetector\Processor\BlackListProcessor */
-                $processor->setStorage('fake');
+                $processor->setStorage($detector->createStorage('fake'));
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
