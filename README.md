@@ -36,18 +36,24 @@ $detector
     // You can add few processors which execute different checks.
     // Processors may check request from proxy, existance of user in blacklist, etc.
     // This processor check if number of requests reached.
-    ->declareProcessor('requestRate', function($processor) {
+    ->declareProcessor('requestRate', function($processor, $detector) {
         /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
+        /* @var $detector \Sokil\FraudDetector\Processor\Detector */
         $processor
             // Limit set as 5 requests for one second.
-            ->setRequestRate(5, 1)
             // Collector used to store stat of requests
-            ->setCollector('memcached', function($collector) {
-                /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
-                $memcached = new \Memcached();
-                $memcached->addServer('127.0.0.1', 11211);
-                $collector->setStorage($memcached);
-            });
+            ->setCollector($detector->createCollector(
+                'memcached', // collector type
+                'requestRate', // namespace
+                5, // requests
+                1, // time interval in seconds
+                function($collector) {
+                    /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
+                    $memcached = new \Memcached();
+                    $memcached->addServer('127.0.0.1', 11211);
+                    $collector->setStorage($memcached);
+                }
+            ));
     })
     ->onCheckPassed(function() use($status) {
         // do something on success request

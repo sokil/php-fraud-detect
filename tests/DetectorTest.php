@@ -2,6 +2,8 @@
 
 namespace Sokil\FraudDetector;
 
+use Sokil\FraudDetector\Processor\RequestRateProcessor;
+
 class DetectorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCheck_RequestRate_FakeCollector()
@@ -13,11 +15,9 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector
             ->setKey('someKey')
-            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+            ->declareProcessor('requestRate', function(RequestRateProcessor $processor, Detector $detector) {
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
-                $processor
-                    ->setRequestRate(5, 1)
-                    ->setCollector('fake');
+                $processor->setCollector($detector->createCollector('fake', 'requestRate', 5, 1));
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
@@ -49,18 +49,20 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector
             ->setKey('someKey')
-            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+            ->declareProcessor('requestRate', function(RequestRateProcessor $processor, Detector $detector) {
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
-                $processor
-                    ->setRequestRate(5, 1)
-                    ->setCollector('memcached', function($collector) {
+                $processor->setCollector($detector->createCollector(
+                    'memcached',
+                    'requestRate',
+                    5,
+                    1,
+                    function($collector) {
                         /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
-
                         $memcached = new \Memcached();
                         $memcached->addServer('127.0.0.1', 11211);
-
-                        $collector->setStorage($memcached);
-                    });
+                        $collector->setMemcached($memcached);
+                    }
+                ));
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
@@ -113,18 +115,21 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
         // configure detector
         $detector
             ->setKey('someKey')
-            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) use($pdo) {
+            ->declareProcessor('requestRate', function(RequestRateProcessor $processor, Detector $detector) use($pdo) {
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
-                $processor
-                    ->setRequestRate(5, 1)
-                    ->setCollector('pdo_mysql', function($collector) use($pdo) {
-                        /* @var $collector \Sokil\FraudDetector\Collector\MemcachedCollector */
-
+                $processor->setCollector($detector->createCollector(
+                    'pdo_mysql',
+                    'requestRate',
+                    5,
+                    1,
+                    function($collector) use($pdo) {
+                        /* @var $collector \Sokil\FraudDetector\Collector\PdoMysqlCollector */
                         $collector
-                            ->setStorage($pdo)
+                            ->setPdo($pdo)
                             ->setTableName('test_collector')
                             ->setGarbageCollector(1,1);
-                    });
+                    }
+                ));
             })
             ->onCheckPassed(function() use($status) {
                 $status->ok = true;
@@ -240,11 +245,9 @@ class DetectorTest extends \PHPUnit_Framework_TestCase
 
         $detector
             ->setKey('someKey')
-            ->declareProcessor('requestRate', function(\Sokil\FraudDetector\Processor\RequestRateProcessor $processor) {
+            ->declareProcessor('requestRate', function(RequestRateProcessor $processor, Detector $detector) {
                 /* @var $processor \Sokil\FraudDetector\Processor\RequestRateProcessor */
-                $processor
-                    ->setRequestRate(5, 1)
-                    ->setCollector('fake');
+                $processor->setCollector($detector->createCollector('fake', 'requestRate', 5, 1));
             })
             ->declareProcessor('blackList', function($processor) {
                 /* @var $processor \Sokil\FraudDetector\Processor\BlackListProcessor */

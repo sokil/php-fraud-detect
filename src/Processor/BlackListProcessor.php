@@ -2,13 +2,11 @@
 
 namespace Sokil\FraudDetector\Processor;
 
-use \Sokil\FraudDetector\AbstractProcessor;
-
 class BlackListProcessor extends AbstractProcessor
 {
     /**
      *
-     * @var \Sokil\FraudDetector\Processor\BlackList\AbstractStorage
+     * @var \Sokil\FraudDetector\Processor\BlackList\Storage\AbstractStorage
      */
     private $storage;
 

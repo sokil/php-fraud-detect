@@ -2,8 +2,6 @@
 
 namespace Sokil\FraudDetector\Processor;
 
-use \Sokil\FraudDetector\AbstractProcessor;
-
 class VariableProcessor extends AbstractProcessor
 {
     const CONDITION_EXISTS      = 'exists';

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\FraudDetector\Processor\RequestRate\Collector;
+namespace Sokil\FraudDetector\Collector;
 
 class FakeCollector extends AbstractCollector
 {

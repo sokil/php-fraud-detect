@@ -4,6 +4,8 @@ namespace Sokil\FraudDetector;
 
 use Sokil\DataType\PriorityList;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Sokil\FraudDetector\Processor\ProcessorInterface;
+use Sokil\FraudDetector\Collector\CollectorInterface;
 
 class Detector
 {
@@ -32,7 +34,7 @@ class Detector
     );
 
     private $collectorNamespaces = array(
-        '\Sokil\FraudDetector\Processor\RequestRate\Collector',
+        '\Sokil\FraudDetector\Collector',
     );
 
     /**
@@ -163,7 +165,7 @@ class Detector
         // configure processor
         $configuratorCallable = $this->processorDeclarationList->get($processorName);
         if($configuratorCallable && is_callable($configuratorCallable)) {
-            call_user_func($configuratorCallable, $processor);
+            call_user_func($configuratorCallable, $processor, $this);
         }
 
         $this->processorList[$processorName] = $processor;
@@ -177,7 +179,7 @@ class Detector
         return $this;
     }
 
-    public function getCollectorClassName($type)
+    private function getCollectorClassName($type)
     {
         if(false == strpos($type, '_')) {
             $className = ucfirst($type);
@@ -195,6 +197,38 @@ class Detector
         }
 
         throw new \Exception('Class ' . $fullyQualifiedClassName . ' not found');
+    }
+
+    /*
+     * @param int $requestNumber maximum number of allowed requests
+     * @param int $timeInterval time interval in seconds
+     */
+    public function createCollector(
+        $type,
+        $namespace,
+        $requestNumber,
+        $timeInterval,
+        $configuratorCallable = null
+    ) {
+        $className = $this->getCollectorClassName($type);
+
+        $collector = new $className(
+            $this->getKey() . ':' . $namespace,
+            $requestNumber,
+            $timeInterval
+        );
+
+        if (!($collector instanceof CollectorInterface)) {
+            throw new \Exception('Collector must inherit CollectorInterface');
+        }
+
+        // configure
+        if(is_callable($configuratorCallable)) {
+            call_user_func($configuratorCallable, $collector, $this);
+        }
+
+        return $collector;
+
     }
 
     private function on($stateName, $callable)

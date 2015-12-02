@@ -1,6 +1,6 @@
 <?php
 
-namespace Sokil\FraudDetector\Processor\RequestRate\Collector;
+namespace Sokil\FraudDetector\Collector;
 
 /**
  * Using memory table of MySQL storate as collector
@@ -37,7 +37,7 @@ class PdoMysqlCollector extends AbstractPdoCollector
         );
 
         try {
-            $stmt = $this->storage->prepare($query);
+            $stmt = $this->pdo->prepare($query);
             $result = @$stmt->execute($parameters);
             if(!$result) {
                 throw new \PDOException('Table not exists');
@@ -57,7 +57,7 @@ class PdoMysqlCollector extends AbstractPdoCollector
 
     private function createTable()
     {
-        $this->storage->query('
+        $this->pdo->query('
             CREATE TABLE ' . $this->getTableName() . '(
                 `key` varchar(255) PRIMARY KEY NOT NULL,
                 `requestNum` int NOT NULL DEFAULT 0,
@@ -79,7 +79,7 @@ class PdoMysqlCollector extends AbstractPdoCollector
                 WHERE `key` = :key
                 FOR UPDATE';
 
-            $stmt = $this->storage->prepare($query);
+            $stmt = $this->pdo->prepare($query);
             $result = @$stmt->execute(array(
                 ':key' => $this->key,
             ));
@@ -106,7 +106,7 @@ class PdoMysqlCollector extends AbstractPdoCollector
                 ON DUPLICATE KEY UPDATE requestNum = requestNum + 1
             ';
 
-            $stmt = $this->storage->prepare($query);
+            $stmt = $this->pdo->prepare($query);
             $stmt->bindValue(':key', $this->key);
             $stmt->bindValue(':expired', $timeNow + $this->timeInterval);
             $stmt->execute();
@@ -142,7 +142,7 @@ class PdoMysqlCollector extends AbstractPdoCollector
             );
         }
 
-        $stmt = $this->storage->prepare($query);
+        $stmt = $this->pdo->prepare($query);
         $stmt->execute($parameters);
 
 

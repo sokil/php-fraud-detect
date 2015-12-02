@@ -1,6 +1,8 @@
 <?php
 
-namespace Sokil\FraudDetector;
+namespace Sokil\FraudDetector\Processor;
+
+use Sokil\FraudDetector\Detector;
 
 abstract class AbstractProcessor implements ProcessorInterface
 {
