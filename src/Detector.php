@@ -78,6 +78,8 @@ class Detector
      */
     public function check()
     {
+        $this->state = self::STATE_UNCHECKED;
+        
         // check all conditions
         /* @var $processor \Sokil\FraudDetector\ProcessorInterface */
         foreach($this->processorDeclarationList->getKeys() as $processorName) {
