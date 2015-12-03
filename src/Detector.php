@@ -86,12 +86,16 @@ class Detector
             if($processor->isPassed()) {
                 $processor->afterCheckPassed();
                 $this->trigger(self::STATE_PASSED . ':' . $processorName);
-                $this->state = self::STATE_PASSED;
+                
+                // check passed if all processors passes their cheks
+                if ($this->state === self::STATE_UNCHECKED) {
+                    $this->state = self::STATE_PASSED;
+                }
             } else {
                 $processor->afterCheckFailed();
                 $this->trigger(self::STATE_FAILED . ':' . $processorName);
+                // if any processor failed - all check failed
                 $this->state = self::STATE_FAILED;
-                break;
             }
         }
 
