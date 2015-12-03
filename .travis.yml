@@ -12,8 +12,8 @@ php:
 matrix:
   fast_finish: true
   allow_failures:
-    - phpHHVM: hhvm
-    - php7: 7
+    # - phpHHVM: hhvm
+    # - php7: 7
 
 services:
   - memcached
