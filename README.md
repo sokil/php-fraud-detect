@@ -31,7 +31,9 @@ If there are not enought functionality of your frontend server, like [Nginx requ
 
 $detector = new \Sokil\FraudDetector\Detector();
 $detector
-    // Configure unique user identifier like session id or track id or user ip
+    // Configure unique user identifier like session id or track id or user ip.
+    // This key defines scope of checking. It may limit check on concrete request, by session or globally
+    // by user. So you can set key as concatenation of different parameters, e.g. $_SERVER['REQUEST_URE'] . session_id().
     ->setKey(session_id())
     // You can add few processors which execute different checks.
     // Processors may check request from proxy, existance of user in blacklist, etc.
